@@ -4,12 +4,11 @@ try:
     import Crypto
     import requests
 
-except ImportError: 
-    import os 
-    os.system("pip install -r requirements.txt")
-
-else: 
     from modules.main import *
 
     if __name__ == '__main__':
         Manager().main()
+
+except ImportError: 
+    import os
+    os.system("pip install -r requirements.txt")
