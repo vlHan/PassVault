@@ -6,6 +6,7 @@ import getpass
 import string
 import time
 import sys
+import sqlite3
 
 from modules.banner import *
 from modules.database import DataBase
@@ -82,7 +83,7 @@ class Menu:
                 # Make a request in the URL gaved.
                 requests.get(self.url)
 
-            except ConnectionError:
+            except sqlite3.ConnectionError:
                 # If the connection does not work, the URL is incorrect.
                 # Then the question will return
                 print(Fore.RED + "Invalid URL." + Style.RESET_ALL)
@@ -165,7 +166,7 @@ class Menu:
                             # Make a request in the URL gaved.
                             requests.get(new)
 
-                        except ConnectionError:
+                        except sqlite3.ConnectionError:
                             # If the connection does not work, the URL is incorrect.
                             # Then the question will return
                             print(Fore.RED + "\nInvalid URL. Please try again.\n" +

@@ -40,6 +40,7 @@ class DataBase:
             self.cursor.execute(
                 "CREATE TABLE passwords (platform txt, email txt, password txt, url txt, key txt)")
             self.datab.commit()
+            self.datab.close()
         except sqlite3.Error:
             pass
 
@@ -125,8 +126,7 @@ class DataBase:
                 try:
                     _iv, _ct = self.data_encrypt(i, self.master_pssw[0:32])
                 except EmptyInput:
-                    sys.exit(
-                        Fore.RED + 'The input cannot be empty. Please try again.' + Style.RESET_ALL)
+                    sys.exit(Fore.RED + 'The input cannot be empty. Please try again.' + Style.RESET_ALL)
                 concatenate = _iv + "|" + _ct
                 infos.append(concatenate)
 
@@ -137,9 +137,9 @@ class DataBase:
                 if key not in stored_key:
                     break
 
-            self.cursor.execute(
-                f"INSERT INTO passwords VALUES('{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}', '{key}')")
+            self.cursor.execute(f"INSERT INTO passwords VALUES('{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}', '{key}')")
             self.datab.commit()
+            self.datab.close()
             print(
                 Fore.GREEN + "\nThank you! Datas were added successfully.\n" + Style.RESET_ALL)
 
@@ -168,6 +168,7 @@ class DataBase:
             print(
                 Fore.GREEN + f"The {option} has successfully changed to {new}." + Style.RESET_ALL)
             self.datab.commit()
+            self.datab.close()
 
         else:
             raise DatabaseNotFound
@@ -212,11 +213,10 @@ class DataBase:
                     infos.append(row[3])
                     decrypted = []
                     for i in infos:
-                        decrypted.append(self.data_decrypt(str(i).split(
-                            "|")[0], str(i).split("|")[1], self.master_pssw[0:32]))
+                        decrypted.append(self.data_decrypt(str(i).split("|")[0], str(i).split("|")[1], self.master_pssw[0:32]))
+                    infos = []
 
-                    print(
-                        f"Platform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\nKey: {str(row[4])}\n")
+                    print(f"Platform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\nKey: {str(row[4])}\n")
 
             else:
                 raise DatabaseNotFound
@@ -241,6 +241,7 @@ class DataBase:
             print("\nThe database is empty. Try adding a password.")
 
         self.datab.commit()
+        self.datab.close()
 
     def delete_pwds(self) -> None:
         """
@@ -270,6 +271,7 @@ class DataBase:
             self.cursor.execute("DROP TABLE passwords")
 
             self.datab.commit()
+            self.datab.close()
 
             time.sleep(1)
             print(
@@ -298,6 +300,7 @@ class DataBase:
                 self.cursor.execute("""SELECT COUNT(*) from passwords""")
                 self.cursor.execute("DROP TABLE passwords")
                 self.datab.commit()
+                self.datab.close()
 
             except sqlite3.Error:
                 raise sqlite3.Error
