@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-try: 
+try:
     import sqlite3
     import Crypto
     import requests
 
-except ImportError: 
-    import os 
+except ImportError:
+    import os
     os.system("pip install -r requirements.txt")
 
-else: 
-    from modules.main import *
+from modules.main import *
 
-    if __name__ == '__main__':
-        Manager().main()
+if __name__ == '__main__':
+    Manager().main()
