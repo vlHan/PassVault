@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
 import random
-import re
 import getpass
 import string
 import time
@@ -31,11 +30,11 @@ class Menu:
             - password [str]
             - url [str]
         """
-        self.db = DataBase(master_pw)
-        self.platform = ""
-        self.mail = ""
-        self.password = ""
-        self.url = ""
+        self._db = DataBase(master_pw)
+        self._platform = ""
+        self._mail = ""
+        self._password = ""
+        self._url = ""
 
     def __begin_informations(self) -> str:
         """
@@ -48,37 +47,29 @@ class Menu:
         Raises 
             ConnectionError: request does not work 
         """
-        self.platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
+        self._platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
-        if self.platform == "exit":
+        if self._platform == "exit":
             banner()
             sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
 
-        if self.platform.isnumeric() or self.platform.isspace():
+        if self._platform.isnumeric() or self._platform.isspace():
             print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
             return self.__begin_informations()
 
-        self.mail = str(input(f"Enter the email for this account: ")).lower().strip()
-        self.url = str(input(f"Enter the URL of the website (ex. https://google.com): ")).lower().strip()
+        self._mail = str(input(f"Enter the email for this account: ")).lower().strip()
+        self._url = str(input(f"Enter the URL of the website (ex. https://google.com): ")).lower().strip()
 
-        # Regex for the email verification
-        if not re.search(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$", self.mail):
-            # Verify if the domain from the email and URL is correct.
-            print(Fore.RED + "Invalid domain of the email." + Style.RESET_ALL)
-            time.sleep(1)
-
-            return self.__begin_informations()
-
-        elif not self.url.startswith("http"):
+        if not self._url.startswith("http"):
             print(Fore.RED + "Invalid URL. The URL must contain http:// or https:// in the beginning." + Style.RESET_ALL)
             time.sleep(1)
 
             return self.__begin_informations()
 
-        elif self.url.startswith("http"):
+        elif self._url.startswith("http"):
             try:
                 # Make a request in the URL gaved.
-                requests.get(self.url)
+                requests.get(self._url)
 
             except sqlite3.ConnectionError:
                 # If the connection does not work, the URL is incorrect.
@@ -88,7 +79,7 @@ class Menu:
 
                 return self.__begin_informations()
 
-        want_gen = str(input(f"Do you want to generate a password for {self.platform}? (Y/n): ")).lower().strip()
+        want_gen = str(input(f"Do you want to generate a password for {self._platform}? (Y/n): ")).lower().strip()
         # Generate a password for a platform.
         if want_gen == "exit":
             banner()
@@ -102,7 +93,7 @@ class Menu:
                 return self.__generate_pass()
 
         elif want_gen == "n":
-            self.password = getpass.getpass(prompt=f"Enter the password which you want to add for {self.platform} in the database (ex. password123): ").strip()
+            self._password = getpass.getpass(prompt=f"Enter the password which you want to add for {self._platform} in the database (ex. password123): ").strip()
 
         else:
             print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
@@ -130,13 +121,13 @@ class Menu:
         if ask == "1".strip():
             # add password
             self.__begin_informations()
-            self.db.save_password(self.platform, self.mail,
-                                  self.password, self.url)
+            self._db.save_password(self._platform, self._mail,
+                                  self._password, self._url)
 
         elif ask == "2".strip():
             # update informations
             try:
-                self.db.see_all()
+                self._db.see_all()
             except DatabaseEmpty:
                 print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
 
@@ -165,25 +156,18 @@ class Menu:
                             time.sleep(1)
                             return self.menu_interface()
 
-                if option == "email":
-                    if not re.search(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$", new):
-                        # Verify if the domain from the email and URL is correct.
-                        print(Fore.RED +"\nInvalid domain of the email. Please try again.\n" + Style.RESET_ALL)
-                        time.sleep(1)
-                        return self.menu_interface()
-
             else:
                 print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
                 return self.menu_interface()
 
             key = str(
                 input(f"\nEnter the key of the {option}: "))
-            self.db.__edit_password(option, new, key)
+            self._db.__edit_password(option, new, key)
 
         elif ask == "3".strip():
             # look up password
             try:
-                self.db.see_all()
+                self._db.see_all()
             except DatabaseEmpty:
                 print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
 
@@ -230,7 +214,7 @@ class Menu:
             enter_pw = str(
                 input("Enter the password generated which you want to use: ")).strip()
             if not enter_pw.isspace() or not enter_pw == "":
-                self.password = enter_pw
+                self._password = enter_pw
 
             else:
                 print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
@@ -254,10 +238,10 @@ class Menu:
                 """Delete a normal password stored in the database SQlite.
                 """
                 print(Fore.RED + 'NOTE: If you delete a normal password the information which is together will also be deleted.' + Style.RESET_ALL)
-                self.db.see_all()
+                self._db.see_all()
                 key = str(input("Enter the key of the password which you want to delete: ")).strip()
 
-                self.db.delete_one(key)
+                self._db.delete_one(key)
 
             elif delete_pwd == "master":
                 """Delete the master password and all the informations. It 
@@ -268,7 +252,18 @@ class Menu:
                 confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
                 if confirm == "y":
                     try:
-                        self.db.delete_master()
+                        self._db.delete_master()
+                        time.sleep(1)
+
+                        print(Fore.GREEN + "Done. All the passwods including the master password had been deleted with success." + Style.RESET_ALL)
+                        time.sleep(1)
+
+                        print(Fore.RED + 'Now you will be logged out.' + Style.RESET_ALL)
+                        time.sleep(2)
+
+                        banner()
+                        sys.exit(Fore.GREEN + 'Thanks for using.' + Style.RESET_ALL)
+
                     except DatabaseNotFound:
                         print(Fore.RED + 'Database was not found. Try to reload the program' + Style.RESET_ALL)
                         return self.delete_one()
@@ -297,7 +292,7 @@ class Menu:
 
         if confirm == "y":
             try:
-                self.db.delete_pwds()
+                self._db.delete_pwds()
             except DatabaseEmpty:
                 print("\nThe database is empty. There are no passwords stored to delete.\n")
         elif confirm == "n":
