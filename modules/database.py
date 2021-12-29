@@ -14,9 +14,6 @@ from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
-__author__ = "vlHan"
-__version__ = "V1.1"
-
 
 class DataBase:
     def __init__(self, master_pssw: str) -> None:

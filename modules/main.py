@@ -9,9 +9,6 @@ import sys
 
 from modules.menu import *
 
-__author__ = "vlHan"
-__version__ = "V1.0"
-
 
 class Manager:
     def main(self, verify=False):

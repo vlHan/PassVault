@@ -11,9 +11,6 @@ from modules.banner import *
 from modules.database import DataBase
 from modules.exceptions import *
 
-__author__ = "vlHan"
-__version__ = "V1.0"
-
 
 class Menu:
     def __init__(self, master_pw: str) -> None:
