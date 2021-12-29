@@ -15,6 +15,7 @@ from modules.exceptions import *
 __author__ = "vlHan"
 __version__ = "V1.0"
 
+
 class Menu:
     def __init__(self, master_pw: str) -> None:
         """
@@ -47,8 +48,7 @@ class Menu:
         Raises 
             ConnectionError: request does not work 
         """
-        self.platform = (str(input(
-            "Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title())
+        self.platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
         if self.platform == "exit":
             banner()
@@ -58,10 +58,8 @@ class Menu:
             print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
             return self.__begin_informations()
 
-        self.mail = (
-            str(input(f"Enter the email for this account: ")).lower().strip())
-        self.url = (str(input(
-            f"Enter the URL of the website (ex. https://google.com): ")).lower().strip())
+        self.mail = str(input(f"Enter the email for this account: ")).lower().strip()
+        self.url = str(input(f"Enter the URL of the website (ex. https://google.com): ")).lower().strip()
 
         # Regex for the email verification
         if not re.search(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$", self.mail):
@@ -72,8 +70,7 @@ class Menu:
             return self.__begin_informations()
 
         elif not self.url.startswith("http"):
-            print(
-                Fore.RED + "Invalid URL. The URL must contain http:// or https:// in the beginning." + Style.RESET_ALL)
+            print(Fore.RED + "Invalid URL. The URL must contain http:// or https:// in the beginning." + Style.RESET_ALL)
             time.sleep(1)
 
             return self.__begin_informations()
@@ -91,8 +88,7 @@ class Menu:
 
                 return self.__begin_informations()
 
-        want_gen = (str(input(
-            f"Do you want to generate a password for {self.platform}? (Y/n): ")).lower().strip())
+        want_gen = str(input(f"Do you want to generate a password for {self.platform}? (Y/n): ")).lower().strip()
         # Generate a password for a platform.
         if want_gen == "exit":
             banner()
@@ -102,13 +98,11 @@ class Menu:
             try:
                 return self.__generate_pass()
             except CharNotLongEnough:
-                print(
-                    Fore.RED + "\nThe password is not long enough. Please try again.\n" + Style.RESET_ALL)
+                print(Fore.RED + "\nThe password is not long enough. Please try again.\n" + Style.RESET_ALL)
                 return self.__generate_pass()
 
         elif want_gen == "n":
-            self.password = getpass.getpass(
-                prompt=f"Enter the password which you want to add for {self.platform} in the database (ex. password123): ").strip()
+            self.password = getpass.getpass(prompt=f"Enter the password which you want to add for {self.platform} in the database (ex. password123): ").strip()
 
         else:
             print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
@@ -144,15 +138,12 @@ class Menu:
             try:
                 self.db.see_all()
             except DatabaseEmpty:
-                print(
-                    Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+                print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
 
-            option = str(input(
-                "What do you want to change? (platform/email/password/url) ")).lower().strip()
+            option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
 
             if option == "platform" or "email" or "password" or "url":
-                new = str(
-                    input(f"\nEnter the new {option} which you want add in the database: ")).strip()
+                new = str(input(f"\nEnter the new {option} which you want add in the database: ")).strip()
 
                 if option == "url":
                     if not new.startswith("http"):
@@ -177,8 +168,7 @@ class Menu:
                 if option == "email":
                     if not re.search(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$", new):
                         # Verify if the domain from the email and URL is correct.
-                        print(Fore.RED +
-                            "\nInvalid domain of the email. Please try again.\n" + Style.RESET_ALL)
+                        print(Fore.RED +"\nInvalid domain of the email. Please try again.\n" + Style.RESET_ALL)
                         time.sleep(1)
                         return self.menu_interface()
 
@@ -195,8 +185,7 @@ class Menu:
             try:
                 self.db.see_all()
             except DatabaseEmpty:
-                print(
-                    Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+                print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
 
         elif ask == "4".strip():
             # delete a password
@@ -228,8 +217,7 @@ class Menu:
         Raises
             CharNotLongEnough: the password is not long enough
         """
-        pwd_len = int(
-            input("What length would you like your password to be? "))
+        pwd_len = int(input("What length would you like your password to be? "))
         pwd_count = int(input("How many passwords would you like? "))
 
         if pwd_len < 3:
@@ -255,8 +243,7 @@ class Menu:
         Raises 
             DatabaseNotFound: the database was not found
         """
-        delete_pwd = str(input(
-            "Do you want to delete a normal password or the master password? (normal/master) ").lower().strip())
+        delete_pwd = str(input("Do you want to delete a normal password or the master password? (normal/master) ").lower().strip())
 
         if delete_pwd == "exit":
             sys.exit(Fore.RED + "Thanks for using." + Style.RESET_ALL)
@@ -278,14 +265,12 @@ class Menu:
                 """
                 print(
                     Fore.RED + 'NOTE: If you delete the master password you will lost all your sensitives data and will be logged out' + Style.RESET_ALL)
-                confirm = (str(input(
-                    "Are you sure you want to delete the master password? (Y/n) ")).strip().lower())
+                confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
                 if confirm == "y":
                     try:
                         self.db.delete_master()
                     except DatabaseNotFound:
-                        print(
-                            Fore.RED + 'Database was not found. Try to reload the program' + Style.RESET_ALL)
+                        print(Fore.RED + 'Database was not found. Try to reload the program' + Style.RESET_ALL)
                         return self.delete_one()
 
                 elif confirm == "n":
@@ -314,8 +299,7 @@ class Menu:
             try:
                 self.db.delete_pwds()
             except DatabaseEmpty:
-                print(
-                    "\nThe database is empty. There are no passwords stored to delete.\n")
+                print("\nThe database is empty. There are no passwords stored to delete.\n")
         elif confirm == "n":
             pass
         elif confirm == "exit":

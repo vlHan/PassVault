@@ -38,7 +38,7 @@ class DataBase:
         try:
             # Connect with the SQlite and create the table.
             self.cursor.execute(
-                "CREATE TABLE passwords (platform txt, email txt, password txt, url txt, key txt)")
+                "CREATE TABLE IF NOT EXISTS passwords (platform txt, email txt, password txt, url txt, key txt);")
             self.datab.commit()
 
         except sqlite3.Error:
@@ -67,8 +67,7 @@ class DataBase:
         # pass the initial_value to base64
         iv = b64encode(cipher.iv).decode('utf-8')
 
-        concatenate = b64encode(concatenate_bytes).decode(
-            'utf-8')  # cyphertext to base64
+        concatenate = b64encode(concatenate_bytes).decode('utf-8')  # cyphertext to base64
 
         return (iv, concatenate)
 
@@ -126,15 +125,13 @@ class DataBase:
                 try:
                     _iv, _ct = self.data_encrypt(i, self.master_pssw[0:32])
                 except EmptyInput:
-                    sys.exit(
-                        Fore.RED + 'The input cannot be empty. Please try again.' + Style.RESET_ALL)
+                    sys.exit(Fore.RED + 'The input cannot be empty. Please try again.' + Style.RESET_ALL)
                 concatenate = _iv + "|" + _ct
                 infos.append(concatenate)
 
             stored_key = self.cursor.execute('SELECT key FROM passwords')
             while True:
-                key = "".join(random.choice(
-                    string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(4))
+                key = "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(4))
                 if key not in stored_key:
                     break
 
@@ -156,19 +153,16 @@ class DataBase:
             try:
                 with open("db/info.json", 'r') as f:
                     jfile = json.load(f)
-                self.master_pssw = self.master_pssw + \
-                    jfile["Informations"]["salt"]
+                self.master_pssw = self.master_pssw + jfile["Informations"]["salt"]
 
             except KeyError:
                 raise PasswordNotFound
 
-            _iv, _ct = self.data_encrypt(
-                new, self.master_pssw[0:32])
+            _iv, _ct = self.data_encrypt(new, self.master_pssw[0:32])
             ct_new_mail = _iv + "|" + _ct
             self.cursor.execute(
                 f"UPDATE passwords SET {option} = '{ct_new_mail}' WHERE key = '{key}'")
-            print(
-                Fore.GREEN + f"The {option} has successfully changed to {new}." + Style.RESET_ALL)
+            print(Fore.GREEN + f"The {option} has successfully changed to {new}." + Style.RESET_ALL)
             self.datab.commit()
 
         else:
@@ -214,8 +208,7 @@ class DataBase:
                     infos.append(row[3])
                     decrypted = []
                     for i in infos:
-                        decrypted.append(self.data_decrypt(str(i).split(
-                            "|")[0], str(i).split("|")[1], self.master_pssw[0:32]))
+                        decrypted.append(self.data_decrypt(str(i).split("|")[0], str(i).split("|")[1], self.master_pssw[0:32]))
                     infos = []
 
                     print(
@@ -234,8 +227,7 @@ class DataBase:
         self.cursor.execute(
             f"DELETE from passwords WHERE key = '{key}'")
         self.datab.commit()
-        print(Fore.GREEN +
-              "\nThe password was deleted successfully.\n" + Style.RESET_ALL)
+        print(Fore.GREEN +"\nThe password was deleted successfully.\n" + Style.RESET_ALL)
         self.cursor.execute("SELECT * from passwords")
 
         try:
@@ -264,8 +256,7 @@ class DataBase:
             raise DatabaseEmpty
 
         else:
-            print(Fore.RED +
-                  "Deleting all data... (database)" + Style.RESET_ALL)
+            print(Fore.RED + "Deleting all data... (database)" + Style.RESET_ALL)
             print("Removing...")
             time.sleep(2)
 
@@ -275,8 +266,7 @@ class DataBase:
             self.datab.commit()
 
             time.sleep(1)
-            print(
-                Fore.GREEN + "Done. All the passwords stored had been deleted with success." + Style.RESET_ALL)
+            print(Fore.GREEN + "Done. All the passwords stored had been deleted with success." + Style.RESET_ALL)
 
     def delete_master(self):
         """Delete the master password and all the informations. It 

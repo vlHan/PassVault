@@ -37,26 +37,22 @@ class Manager:
                     self.run()
 
                 else:
-                    print(
-                        Fore.RED + 'The master password is not correct.\033[0m')
+                    print(Fore.RED + 'The master password is not correct.\033[0m')
                     self.main()
 
             else:
                 print(Fore.GREEN + 'To start, you have to create a master password. Be careful not to lose it as it is unrecoverable.' + Style.RESET_ALL)
-                master_pw = getpass.getpass(
-                    'Create a master password to use the program: ')
-                verify_master = getpass.getpass(
-                    'Enter your master password again to verify it: ')
+                master_pw = getpass.getpass('Create a master password to use the program: ')
+                verify_master = getpass.getpass('Enter your master password again to verify it: ')
                 time.sleep(1)
+                
                 if master_pw == verify_master:
                     if master_pw.isnumeric() or master_pw.isspace():
-                        print(
-                            Fore.RED + '\nThe password is not correct. Please try again.' + Style.RESET_ALL)
+                        print(Fore.RED + '\nThe password is not correct. Please try again.' + Style.RESET_ALL)
                         return self.main()
 
                     elif len(master_pw) < 8:
-                        print(
-                            Fore.RED + '\nThe password must have at least 8 caracters.' + Style.RESET_ALL)
+                        print(Fore.RED + '\nThe password must have at least 8 caracters.' + Style.RESET_ALL)
                         return self.main()
 
                     else:
@@ -66,20 +62,16 @@ class Manager:
                             pass
 
                         jfile = {"Informations": {}}
-                        jfile["Informations"]["salt"] = "".join(random.choice(
-                            string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(32))
-                        jfile["Informations"]["master_password"] = hmac.new(master_pw.encode(), msg=str(
-                            jfile["Informations"]["salt"]).encode(), digestmod=hashlib.sha3_512).hexdigest()
+                        jfile["Informations"]["salt"] = "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(32))
+                        jfile["Informations"]["master_password"] = hmac.new(master_pw.encode(), msg=str(jfile["Informations"]["salt"]).encode(), digestmod=hashlib.sha3_512).hexdigest()
                         with open('db/info.json', 'w', encoding='utf-8') as jsondata:
-                            json.dump(jfile, jsondata,
-                                      sort_keys=True, indent=4)
+                            json.dump(jfile, jsondata, sort_keys=True, indent=4)
 
                         sys.exit(
                             Fore.GREEN + "\nThank you! Restart the program and enter your master password to begin." + Style.RESET_ALL)
 
                 else:
-                    print(
-                        Fore.RED + '\nPassword do not match. Please try again.' + Style.RESET_ALL)
+                    print(Fore.RED + '\nPassword do not match. Please try again.' + Style.RESET_ALL)
                     return self.main()
 
     def run(self):
