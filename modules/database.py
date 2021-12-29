@@ -6,10 +6,9 @@ import time
 import os
 import sys
 import json
+from colorama import Fore, Style 
 
-from modules.banner import *
 from modules.exceptions import *
-from modules.menu import *
 
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
@@ -283,28 +282,19 @@ class DataBase:
         """
         if os.path.isfile('db/info.json') and os.path.isfile('db/data.db'):
             print(Fore.RED + "Deleting all the passwords..." + Style.RESET_ALL)
-            time.sleep(2)
+            time.sleep(1)
+            
+            os.remove('db/info.json')
+            
             try:
-                print("Removing...")
-                os.remove('db/info.json')
-
                 self.cursor.execute("""SELECT COUNT(*) from passwords""")
                 self.cursor.execute("DROP TABLE passwords")
                 self.datab.commit()
+                self.datab.close()
 
             except sqlite3.Error:
                 raise sqlite3.Error
 
-            time.sleep(1)
-
-            print(Fore.GREEN + "Done. All the passwods including the master password had been deleted with success." + Style.RESET_ALL)
-            time.sleep(1)
-
-            print(Fore.RED + 'Now you will be logged out.' + Style.RESET_ALL)
-            time.sleep(2)
-
-            banner()
-            sys.exit(Fore.GREEN + 'Thanks for using.' + Style.RESET_ALL)
 
         else:
             raise DatabaseNotFound
