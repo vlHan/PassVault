@@ -114,14 +114,14 @@ class Menu:
         print(Fore.RED + " 5) Delete all normal passwords" + Style.RESET_ALL)
         print(Fore.RED + " 6) Exit the program" + Style.RESET_ALL)
 
-        ask = str(input("\n └──Enter a choice: "))
-        if ask == "1".strip():
+        ask = str(input("\n └──Enter a choice: ")).strip()
+        if ask == "1":
             # add password
             self.__begin_informations()
             self._db.save_password(self._platform, self._mail,
                                   self._password, self._url)
 
-        elif ask == "2".strip():
+        elif ask == "2":
             # update informations
             try:
                 self._db.see_all()
@@ -157,31 +157,31 @@ class Menu:
                 print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
                 return self.menu_interface()
 
-            key = str(
-                input(f"\nEnter the key of the {option}: "))
-            self._db.__edit_password(option, new, key)
+            id = str(
+                input(f"\nEnter the id of the {option}: "))
+            self._db.edit_password(option, new, id)
 
-        elif ask == "3".strip():
+        elif ask == "3":
             # look up password
             try:
                 self._db.see_all()
             except DatabaseEmpty:
                 print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
 
-        elif ask == "4".strip():
+        elif ask == "4":
             # delete a password
             self.delete_one()
 
-        elif ask == "5".strip():
+        elif ask == "5":
             # delete all passwords
             self.delete_all()
 
-        elif ask == "6".strip():
+        elif ask == "6":
             # Exit
             banner()
             sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
 
-        elif ask == "exit".strip():
+        elif ask == "exit":
             # If it is exit, the program will finish.
             sys.exit(Fore.RED + "Thanks for using." + Style.RESET_ALL)
 
@@ -236,9 +236,9 @@ class Menu:
                 """
                 print(Fore.RED + 'NOTE: If you delete a normal password the information which is together will also be deleted.' + Style.RESET_ALL)
                 self._db.see_all()
-                key = str(input("Enter the key of the password which you want to delete: ")).strip()
+                id = str(input("Enter the id of the password which you want to delete: ")).strip()
 
-                self._db.delete_one(key)
+                self._db.delete_one(id)
 
             elif delete_pwd == "master":
                 """Delete the master password and all the informations. It 

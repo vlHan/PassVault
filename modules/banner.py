@@ -3,7 +3,7 @@
 from colorama import Fore, Style
 
 __author__ = "vlHan"
-__version__ = "V1.0"
+__version__ = "V1.1"
 
 
 def banner() -> None:

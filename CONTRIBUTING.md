@@ -12,6 +12,7 @@ How can I contribute to the project?
 
 ## To Do
 - Some major cleanup and formatting of the code (<a href="https://github.com/vlHan/PassVault/blob/main/modules/database.py">database.py</a>, <a href="https://github.com/vlHan/PassVault/blob/main/modules/main.py">main.py</a>, <a href="https://github.com/vlHan/PassVault/blob/main/modules/menu.py">menu.py</a>)
+- Make a recovery key function to reset the master password.
 
 
 

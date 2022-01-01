@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-import random
 import sqlite3
-import string
 import time
 import os
 import sys
-import json
 from colorama import Fore, Style 
 
 from modules.exceptions import *
@@ -18,27 +15,25 @@ from Crypto.Util.Padding import pad, unpad
 class DataBase:
     def __init__(self, master_pssw: str) -> None:
         """
+        Function to store the data in the database.
+
         Argument
             - master_pssw [str] = the master password
 
-        Variables
-            - platform [str] = the platform
-            - mail [str] = email
-            - pw [str] = password that will be stored in the database.
-            - url [str] = url from the platform
-
         """
         self.master_pssw = master_pssw
-        self.datab = sqlite3.connect("db/data.db")
+        self.datab = sqlite3.connect("vault.db")
         self.cursor = self.datab.cursor()
-        try:
-            # Connect with the SQlite and create the table.
-            self.cursor.execute(
-                "CREATE TABLE IF NOT EXISTS passwords (platform txt, email txt, password txt, url txt, key txt);")
-            self.datab.commit()
-
-        except sqlite3.Error:
-            pass
+        # Connect with the SQlite and create the table.
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS passwords (
+                id INTEGER PRIMARY KEY,
+                platform TEXT NOT NULL,
+                email TEXT NOT NULL, 
+                password TEXT NOT NULL, 
+                url TEXT NOT NULL
+            );"""
+        )
 
     def data_encrypt(self, pssw: str, key: str):
         """
@@ -108,12 +103,20 @@ class DataBase:
             The password saved in the database 
 
         """
-        if os.path.isfile("db/info.json"):
-            with open("db/info.json", 'r') as f:
-                jfile = json.load(f)
+        if os.path.isfile("vault.db"):
+            self.cursor.execute("""SELECT * FROM masterpassword""")
+            for row in self.cursor.fetchall():
+                salt = row[1] 
 
-            self.master_pssw = self.master_pssw + \
-                jfile["Informations"]["salt"]
+            self.master_pssw = self.master_pssw + salt
+            self.cursor.execute("""SELECT id FROM passwords""")
+            id = len(self.cursor.fetchall())
+            while True:
+                if id in self.cursor.execute("""SELECT id FROM passwords"""):
+                    id += 1
+                else: 
+                    id += 1
+                    break 
 
             infos = []
             stored_infos = [platform, mail, password, url]
@@ -125,31 +128,25 @@ class DataBase:
                 concatenate = _iv + "|" + _ct
                 infos.append(concatenate)
 
-            stored_key = self.cursor.execute('SELECT key FROM passwords')
-            while True:
-                key = "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(4))
-                if key not in stored_key:
-                    break
-
-            self.cursor.execute(
-                f"INSERT INTO passwords VALUES('{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}', '{key}')")
+            self.cursor.execute(f"""INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')""")
             self.datab.commit()
 
             print(
                 Fore.GREEN + "\nThank you! Datas were added successfully.\n" + Style.RESET_ALL)
 
-    def __edit_password(self, option: str, new: str, key: str) -> None:
+    def edit_password(self, option: str, new: str, id: int) -> None:
         """
         Update values in the database SQlite.
 
         Returns
             [str] the new password changed in the database
         """
-        if os.path.isfile('db/info.json'):
+        if os.path.isfile('vault.db'):
             try:
-                with open("db/info.json", 'r') as f:
-                    jfile = json.load(f)
-                self.master_pssw = self.master_pssw + jfile["Informations"]["salt"]
+                self.cursor.execute("""SELECT * FROM masterpassword""")
+                for row in self.cursor.fetchall():
+                    salt = row[1] 
+                self.master_pssw = self.master_pssw + salt
 
             except KeyError:
                 raise PasswordNotFound
@@ -157,7 +154,7 @@ class DataBase:
             _iv, _ct = self.data_encrypt(new, self.master_pssw[0:32])
             ct_new_mail = _iv + "|" + _ct
             self.cursor.execute(
-                f"UPDATE passwords SET {option} = '{ct_new_mail}' WHERE key = '{key}'")
+                f"""UPDATE passwords SET {option} = '{ct_new_mail}' WHERE key = '{id}'""")
             print(Fore.GREEN + f"The {option} has successfully changed to {new}." + Style.RESET_ALL)
             self.datab.commit()
 
@@ -184,48 +181,47 @@ class DataBase:
 
         else:
             print()
-            if os.path.isfile("db/info.json"):
+            if os.path.isfile("vault.db"):
                 try:
-                    with open("db/info.json", 'r') as f:
-                        # Open the information file
-                        jfile = json.load(f)
+                    self.cursor.execute("""SELECT * FROM masterpassword""")
+                    for row in self.cursor.fetchall():
+                        salt = row[1] 
 
-                    self.master_pssw = self.master_pssw + \
-                        jfile["Informations"]["salt"]
+                    self.master_pssw = self.master_pssw + salt
 
                 except KeyError:
                     raise PasswordNotFound
 
                 infos = []
-                for row in self.cursor.execute('SELECT * FROM passwords'):
-                    infos.append(row[0])
+                for row in self.cursor.execute("""SELECT * FROM passwords"""):
                     infos.append(row[1])
                     infos.append(row[2])
                     infos.append(row[3])
+                    infos.append(row[4])
                     decrypted = []
                     for i in infos:
                         decrypted.append(self.data_decrypt(str(i).split("|")[0], str(i).split("|")[1], self.master_pssw[0:32]))
+                    
                     infos = []
 
-                    print(
-                        f"Platform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\nKey: {str(row[4])}\n")
+                    print(f"ID: {row[0]}\nPlatform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n")
 
             else:
                 raise DatabaseNotFound
 
-    def delete_one(self, key: str) -> None:
+    def delete_one(self, id: str) -> None:
         """
         Delete values in the Data Base SQlite.
 
         Arguments
             - key [str]
         """
+
         self.cursor.execute(
-            f"DELETE from passwords WHERE key = '{key}'")
+            f"DELETE from passwords WHERE id = '{id}'")
         self.datab.commit()
         print(Fore.GREEN +"\nThe password was deleted successfully.\n" + Style.RESET_ALL)
-        self.cursor.execute("SELECT * from passwords")
-
+        self.cursor.execute("""SELECT * from passwords""")
         try:
             self.see_all()
         except DatabaseEmpty:
@@ -257,7 +253,7 @@ class DataBase:
             time.sleep(2)
 
             # Dropping the databale
-            self.cursor.execute("DROP TABLE passwords")
+            self.cursor.execute("""DROP TABLE passwords""")
 
             self.datab.commit()
 
@@ -277,21 +273,18 @@ class DataBase:
             DatabaseNotFound: database was not found 
 
         """
-        if os.path.isfile('db/info.json') and os.path.isfile('db/data.db'):
+        if os.path.isfile('vault.db'):
             print(Fore.RED + "Deleting all the passwords..." + Style.RESET_ALL)
             time.sleep(1)
             
-            os.remove('db/info.json')
-            
             try:
-                self.cursor.execute("""SELECT COUNT(*) from passwords""")
-                self.cursor.execute("DROP TABLE passwords")
+                self.cursor.execute("""DROP TABLE passwords""")
+                self.cursor.execute("""DROP TABLE masterpassword""")
                 self.datab.commit()
                 self.datab.close()
 
             except sqlite3.Error:
-                raise sqlite3.Error
-
+                raise
 
         else:
             raise DatabaseNotFound

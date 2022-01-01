@@ -1,12 +1,10 @@
-<h1 align="center">PassVault</h1>
+# <a href="https://github.com/vlHan/PassVault"><img src="./.github/logo.png"></a>
 
-<p align="center">
+<p>
    <img alt="Languages" src="https://img.shields.io/badge/Python-3.7%20%7C%203.8-blue.svg"> 
    <img alt="Repository size" src="https://img.shields.io/github/repo-size/vlHan/PassVault">
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
-
-<img src="https://github.com/vlHan/PassVault/blob/main/demo/passvault.png">
 
 ## What Is It?
 It is a command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQlite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
@@ -28,13 +26,11 @@ Clone this repository: `git clone https://github.com/vlHan/PassVault` or <a href
     - Finished!
 
 ## Usage
-After installing, use the following command to install the dependecies and run the program. 
-```
-$ python3 run.py
-```
-Or you can manually install the dependecies and run: 
-```
+```bash
+# Install the dependecies 
 $ pip3 install -r requirements.txt
+
+# Run the program
 $ python3 run.py
 ```
 
@@ -48,19 +44,44 @@ $ python3 run.py
 After following the steps, the code will store your datas, encrypted in AES encryption, that comes from a python library [pycryptodome](https://pypi.org/project/pycryptodome/), in a SQlite file. To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function for the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
 
 ```py
-if os.path.isfile('db/info.json'): # verify if the master password is created
-    with open("db/info.json", 'r') as f: # read the salt stored in the file
-      jfile = json.load(f) 
+with sqlite3.connect('vault.db') as db: # connect with the database sqlite
+    cursor = db.cursor()
 
-    self.master_pw = getpass.getpass('Enter your master password: ') # ask the master password
+if os.path.isfile('vault.db'): # verify if the database exist
+    try: 
+        self.master_pw = getpass.getpass('Enter your master password: ') # ask the master password
 
-    h = hmac.new(self.master_pw.encode(), msg=str(jfile["Informations"]["salt"]).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function 
+        cursor.execute("SELECT * FROM masterpassword") # select the stored data 
+        for row in cursor.fetchall():
+            master = row[0]
+            salt = row[1] 
 
-    if h == jfile["Informations"]["master_password"]: # compare with the hash of the master password
-        ...
+        h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function 
+        if h == master: # compare with the hash of the master password
+            ...
 ```
 
-## Author and Contributor
+## Technologies 
+This project was developed with the following technologies:
+
+**Python Libraries** 
+- UI:
+  - <a href="https://pypi.org/project/colorama/">colorama</a> (add color in the terminal)
+- Database:
+  - <a href="https://docs.python.org/3/library/sqlite3.html">db-sqlite3</a> (sqlite library)
+- Encryption: 
+  - <a href="https://pypi.org/project/pycryptodome/">pycryptodome</a> (cryptography AES) 
+  - <a href="https://docs.python.org/3/library/hmac.html">hmac</a> (Keyed-Hashing for Message Authentication)
+  - <a href="https://docs.python.org/3/library/hashlib.html">hashlib</a> (hash function to use sha3_512)
+  - <a href="https://docs.python.org/3/library/base64.html">base64</a> 
+  - <a href="https://docs.python.org/3/library/random.html">random</a> and <a href="https://docs.python.org/pt-br/3/library/string.html">string</a> (generate random string)
+- Outro:
+  - <a href="https://pypi.org/project/requests/">requests</a> (send HTTP request to the URL gaved)
+  - <a href="https://docs.python.org/3/library/os.html">os</a> and <a href="https://docs.python.org/3/library/sys.html">sys</a> (system libraries)
+  - <a href="https://docs.python.org/pt-br/3/library/getpass.html">getpass</a> (input)
+  - <a href="https://docs.python.org/3/library/time.html">time</a> (interval using sleep)
+
+## Contributor
 
 | [<img src="https://github.com/vlHan.png" width="115"><br><small>@vlHan</small>](https://github.com/vlHan) | [<img src="https://github.com/carvalinh0.png" width="115"><br><small>@carvalinh0</small>](https://github.com/carvalinh0) 
 | :---: | :---: | 
@@ -69,7 +90,9 @@ if os.path.isfile('db/info.json'): # verify if the master password is created
 
 - @carvalinh0 for helping me in the AES encryption.
 
-**All notable changes** to this project will be in [project changelog](CHANGELOG.md)
+### Changelog
+
+All notable changes to this project will be in [project changelog](CHANGELOG.md)
 
 ## Contributing 
 If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
