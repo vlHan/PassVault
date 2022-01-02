@@ -6,7 +6,6 @@
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
 
-## What Is It?
 It is a command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQlite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
 
 
