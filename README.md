@@ -33,7 +33,7 @@ $ pip3 install -r requirements.txt
 $ python3 run.py
 ```
 
-<img src="./demo/demo.gif" height="50%">
+<img src="./demo/demo.gif" height="50%" width="100%"><br>
 
 **⚠️** The program needs all the files, be sure to have all the dependecies and files installed.
 
@@ -79,7 +79,6 @@ This project was developed with the following technologies:
   - <a href="https://docs.python.org/3/library/time.html">time</a> (interval using sleep)
 
 ## Contributing
-
 If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
 
 ### Shoutouts
@@ -87,7 +86,6 @@ If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
 
 | [<img src="https://github.com/vlHan.png" width="115"><br><small>@vlHan</small>](https://github.com/vlHan) | [<img src="https://github.com/carvalinh0.png" width="115"><br><small>@carvalinh0</small>](https://github.com/carvalinh0) 
 | :---: | :---: | 
-
 
 ## License 
 This project is under the [MIT License](LICENSE).
