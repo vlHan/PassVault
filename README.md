@@ -64,7 +64,7 @@ This project was developed with the following technologies:
 - Database:
   - <a href="https://docs.python.org/3/library/sqlite3.html">db-sqlite3</a> (sqlite library)
 - Encryption: 
-  - <a href="https://pypi.org/project/pycryptodome/">pycryptodome</a> (cryptography AES) 
+  - <a href="https://pypi.org/project/pycryptodome/">pycryptodome</a> (AES cryptography) 
   - <a href="https://docs.python.org/3/library/hmac.html">hmac</a> (Keyed-Hashing for Message Authentication)
   - <a href="https://docs.python.org/3/library/hashlib.html">hashlib</a> (hash function to use sha3_512)
   - <a href="https://docs.python.org/3/library/base64.html">base64</a> 
