@@ -6,7 +6,6 @@
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
 
-## What Is It?
 It is a command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQlite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
 
 
@@ -44,21 +43,18 @@ $ python3 run.py
 After following the steps, the code will store your datas, encrypted in AES encryption, that comes from a python library [pycryptodome](https://pypi.org/project/pycryptodome/), in a SQlite file. To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function for the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
 
 ```py
-with sqlite3.connect('vault.db') as db: # connect with the database sqlite
-    cursor = db.cursor()
-
 if os.path.isfile('vault.db'): # verify if the database exist
-    try: 
-        self.master_pw = getpass.getpass('Enter your master password: ') # ask the master password
+      cursor.execute("SELECT * FROM masterpassword") # select the stored data 
+      for row in cursor.fetchall(): 
+          master = row[0] 
+          salt = row[1] 
+      
+      self.master_pw = getpass.getpass('Enter your master password: ') # ask the master password
+      h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function
 
-        cursor.execute("SELECT * FROM masterpassword") # select the stored data 
-        for row in cursor.fetchall():
-            master = row[0]
-            salt = row[1] 
-
-        h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function 
-        if h == master: # compare with the hash of the master password
-            ...
+      # compare the hashes
+      if h == master:
+        # rest of the program
 ```
 
 ## Technologies 

@@ -22,14 +22,14 @@ class Manager:
 
             if os.path.isfile('vault.db'):
                 try: 
-                    self.master_pw = getpass.getpass('Enter your master password: ')
-
                     cursor.execute("SELECT * FROM masterpassword")
                     for row in cursor.fetchall():
                         master = row[0]
                         salt = row[1] 
 
+                    self.master_pw = getpass.getpass('Enter your master password: ')
                     h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
+                    
                     if h == master:
                         Menu(self.master_pw).menu_interface()
                         self.run()
