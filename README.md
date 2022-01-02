@@ -32,9 +32,6 @@ $ pip3 install -r requirements.txt
 # Run the program
 $ python3 run.py
 ```
-
-<img src="./demo/demo.gif" height="50%" width="100%"><br>
-
 **⚠️** The program needs all the files, be sure to have all the dependecies and files installed.
 
 ## How It Works
@@ -77,6 +74,9 @@ This project was developed with the following technologies:
   - <a href="https://docs.python.org/3/library/os.html">os</a> and <a href="https://docs.python.org/3/library/sys.html">sys</a> (system libraries)
   - <a href="https://docs.python.org/pt-br/3/library/getpass.html">getpass</a> (input)
   - <a href="https://docs.python.org/3/library/time.html">time</a> (interval using sleep)
+
+## Example
+<img src="./demo/demo.gif" height="50%" width="100%"><br>
 
 ## Contributing
 If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
