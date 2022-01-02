@@ -1,4 +1,4 @@
-# <a href="https://github.com/vlHan/PassVault"><img src="./.github/logo.png"></a>
+# <a href="https://github.com/vlHan/PassVault"><img src="./demo/logo.png"></a>
 
 <p>
    <img alt="Languages" src="https://img.shields.io/badge/Python-3.7%20%7C%203.8-blue.svg"> 
@@ -33,6 +33,8 @@ $ pip3 install -r requirements.txt
 $ python3 run.py
 ```
 
+<img src="./demo/demo.gif" height="50%">
+
 **⚠️** The program needs all the files, be sure to have all the dependecies and files installed.
 
 ## How It Works
@@ -60,7 +62,6 @@ if os.path.isfile('vault.db'): # verify if the database exist
 ## Technologies 
 This project was developed with the following technologies:
 
-**Python Libraries** 
 - UI:
   - <a href="https://pypi.org/project/colorama/">colorama</a> (add color in the terminal)
 - Database:
@@ -77,21 +78,16 @@ This project was developed with the following technologies:
   - <a href="https://docs.python.org/pt-br/3/library/getpass.html">getpass</a> (input)
   - <a href="https://docs.python.org/3/library/time.html">time</a> (interval using sleep)
 
-## Contributor
+## Contributing
+
+If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
+
+### Shoutouts
+- @carvalinh0 for helping me in the AES encryption.
 
 | [<img src="https://github.com/vlHan.png" width="115"><br><small>@vlHan</small>](https://github.com/vlHan) | [<img src="https://github.com/carvalinh0.png" width="115"><br><small>@carvalinh0</small>](https://github.com/carvalinh0) 
 | :---: | :---: | 
 
-### Shoutouts
-
-- @carvalinh0 for helping me in the AES encryption.
-
-### Changelog
-
-All notable changes to this project will be in [project changelog](CHANGELOG.md)
-
-## Contributing 
-If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
 
 ## License 
 This project is under the [MIT License](LICENSE).
