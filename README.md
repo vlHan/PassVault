@@ -29,14 +29,17 @@ Clone this repository: `git clone https://github.com/vlHan/PassVault` or <a href
 # Install the dependecies 
 $ pip3 install -r requirements.txt
 
-# Run the program
-$ python3 run.py
+# If you are in the diretory 
+$ python3 .
+
+# If you are not
+$ python3 PassVault
 ```
 **⚠️** The program needs all the files, be sure to have all the dependecies and files installed.
 
 ## How It Works
 
-1. After running you need to create your master password. This master password will be the key to indenty if the user is actually you, be sure you have saved, because the master password is **unrecoverable**.
+1. After running you need to create your master password. This master password will be encrypted and this key will be used to indenty if the user is actually you, be sure you have saved, because the master password is **unrecoverable**.
 2. Follow the steps and answer the inputs, these informations will be saved. 
 
 After following the steps, the code will store your datas, encrypted in AES encryption, that comes from a python library [pycryptodome](https://pypi.org/project/pycryptodome/), in a SQlite file. To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function for the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
