@@ -34,6 +34,10 @@ class DataBase:
                 url TEXT NOT NULL
             );"""
         )
+        self.cursor.execute("""SELECT * FROM masterpassword""")
+        for row in self.cursor.fetchall():
+            self.salt = row[1] 
+
 
     def data_encrypt(self, pssw: str, key: str):
         """
@@ -98,11 +102,7 @@ class DataBase:
 
         """
         if os.path.isfile("vault.db"):
-            self.cursor.execute("""SELECT * FROM masterpassword""")
-            for row in self.cursor.fetchall():
-                salt = row[1] 
-
-            self.master_pssw = self.master_pssw + salt
+            self.master_pssw = self.master_pssw + self.salt
             self.cursor.execute("""SELECT id FROM passwords""")
             id = len(self.cursor.fetchall())
             while True:
@@ -138,10 +138,7 @@ class DataBase:
         """
         if os.path.isfile('vault.db'):
             try:
-                self.cursor.execute("""SELECT * FROM masterpassword""")
-                for row in self.cursor.fetchall():
-                    salt = row[1] 
-                self.master_pssw = self.master_pssw + salt
+                self.master_pssw = self.master_pssw + self.salt
 
             except KeyError:
                 raise PasswordNotFound
@@ -178,11 +175,7 @@ class DataBase:
             print()
             if os.path.isfile("vault.db"):
                 try:
-                    self.cursor.execute("""SELECT * FROM masterpassword""")
-                    for row in self.cursor.fetchall():
-                        salt = row[1] 
-
-                    self.master_pssw = self.master_pssw + salt
+                    self.master_pssw = self.master_pssw + self.salt
 
                 except KeyError:
                     raise PasswordNotFound
