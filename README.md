@@ -8,7 +8,6 @@
 
 It is a command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQlite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
 
-
 ## Installation
 Clone this repository: `git clone https://github.com/vlHan/PassVault` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
 - Enter the folder: `cd PassVault/`
@@ -23,6 +22,31 @@ Clone this repository: `git clone https://github.com/vlHan/PassVault` or <a href
     - [Python 3, download and install](https://www.python.org/downloads/)
     - `python -m pip install -r requirements.txt`
     - Finished!
+
+### Project Structure
+```
+PassVault/
+│
+├── modules/
+│   ├── __init__.py
+│   ├── banner.py
+│   ├── database.py
+│   ├── exceptions.py
+|   └── menu.py
+|
+├── demo/
+│   ├── demo.gif
+│   ├── logo.png
+│   └── passvault.png
+|
+├── __main__.py
+├── LICENSE
+├── README.md
+├── .gitignore
+├── requirements.txt
+├── CHANGELOG.md
+└── CONTRIBUTING.md
+```
 
 ## Usage
 ```bash
