@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from modules import *
+
 import requests
 import random
 import getpass
@@ -6,10 +8,6 @@ import string
 import time
 import sys
 import sqlite3
-
-from modules.banner import *
-from modules.database import DataBase
-from modules.exceptions import *
 
 
 class Menu:

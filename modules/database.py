@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
+from modules import *
 import sqlite3
 import time
 import os
 import sys
 from colorama import Fore, Style 
 
-from modules.exceptions import *
-
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-
 
 class DataBase:
     def __init__(self, master_pssw: str) -> None:
