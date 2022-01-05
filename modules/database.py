@@ -93,12 +93,6 @@ class DataBase:
         """
         Add values in the Data Base SQlite.
 
-        Arguments
-            - platform [str]
-            - mail [str]
-            - password [str]
-            - url [str]
-
         Returns 
             The password saved in the database 
 
@@ -140,6 +134,7 @@ class DataBase:
 
         Returns
             [str] the new password changed in the database
+            - id [int]
         """
         if os.path.isfile('vault.db'):
             try:
@@ -154,7 +149,7 @@ class DataBase:
             _iv, _ct = self.data_encrypt(new, self.master_pssw[0:32])
             ct_new_mail = _iv + "|" + _ct
             self.cursor.execute(
-                f"""UPDATE passwords SET {option} = '{ct_new_mail}' WHERE key = '{id}'""")
+                f"""UPDATE passwords SET {option} = '{ct_new_mail}' WHERE id = '{id}'""")
             print(Fore.GREEN + f"The {option} has successfully changed to {new}." + Style.RESET_ALL)
             self.datab.commit()
 
@@ -214,7 +209,7 @@ class DataBase:
         Delete values in the Data Base SQlite.
 
         Arguments
-            - key [str]
+            - id [int]
         """
 
         self.cursor.execute(
@@ -265,8 +260,7 @@ class DataBase:
         is not possible decrypt the data without the master password.
 
         Returns 
-            The master password deleted (.json)
-            The database SQlite empty (.db)
+            The database SQlitefile empty (.db)
 
         Raises 
             sqlite3.Error: error in the database  
