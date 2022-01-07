@@ -15,6 +15,9 @@ except ImportError:
     
 
 class Manager:
+    def __init__(self) -> None:
+        self.master_pw = None
+        
     def main(self, verify=False):
         """Main function to verify the user
         """
@@ -23,9 +26,9 @@ class Manager:
             self.run()
 
         else:
-            if os.path.isfile('vault.db'):
-                with sqlite3.connect('vault.db') as db: 
+            with sqlite3.connect('vault.db') as db: 
                     cursor = db.cursor()
+            if os.path.isfile('vault.db'):
 
                 try: 
                     cursor.execute("SELECT * FROM masterpassword")
