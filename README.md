@@ -23,42 +23,15 @@ Clone this repository: `git clone https://github.com/vlHan/PassVault` or <a href
     - `python -m pip install -r requirements.txt`
     - Finished!
 
-### Project Structure
-```
-PassVault/
-│
-├── modules/
-│   ├── __init__.py
-│   ├── banner.py
-│   ├── database.py
-│   ├── exceptions.py
-|   └── menu.py
-|
-├── demo/
-│   ├── demo.gif
-│   ├── logo.png
-│   └── passvault.png
-|
-├── __main__.py
-├── LICENSE
-├── README.md
-├── .gitignore
-├── requirements.txt
-├── CHANGELOG.md
-└── CONTRIBUTING.md
-```
-
 ## Usage
 ```bash
-# Install the dependecies 
-$ pip3 install -r requirements.txt
-
-# If you are in the diretory 
+# Run the program in the diretory
 $ python3 .
 
-# If you are not
+# Run the program out of the diretory 
 $ python3 PassVault
 ```
+
 **⚠️** The program needs all the files, be sure to have all the dependecies and files installed.
 
 ## How It Works
