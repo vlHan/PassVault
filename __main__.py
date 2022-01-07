@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
+from modules import *
 try:
     import Crypto
     import requests
-
+    import sqlite3
+    import hashlib 
+    import hmac
+    import getpass
+    import time
+    import random, string, sys, os
 except ImportError:
     import os
     os.system("pip install -r requirements.txt")
-
-from modules import *
-
-import sqlite3
-import hashlib 
-import hmac
-import getpass
-import time
-import random, string, sys, os
+    
 
 class Manager:
     def main(self, verify=False):
@@ -25,10 +23,10 @@ class Manager:
             self.run()
 
         else:
-            with sqlite3.connect('vault.db') as db: 
-                cursor = db.cursor()
-
             if os.path.isfile('vault.db'):
+                with sqlite3.connect('vault.db') as db: 
+                    cursor = db.cursor()
+
                 try: 
                     cursor.execute("SELECT * FROM masterpassword")
                     for row in cursor.fetchall():
