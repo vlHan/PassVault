@@ -56,36 +56,14 @@ if os.path.isfile('vault.db'): # verify if the database exist
         # rest of the program
 ```
 
-## Technologies 
-This project was developed with the following technologies:
-
-- UI:
-  - <a href="https://pypi.org/project/colorama/">colorama</a> (add color in the terminal)
-- Database:
-  - <a href="https://docs.python.org/3/library/sqlite3.html">db-sqlite3</a> (sqlite library)
-- Encryption: 
-  - <a href="https://pypi.org/project/pycryptodome/">pycryptodome</a> (AES cryptography) 
-  - <a href="https://docs.python.org/3/library/hmac.html">hmac</a> (Keyed-Hashing for Message Authentication)
-  - <a href="https://docs.python.org/3/library/hashlib.html">hashlib</a> (hash function to use sha3_512)
-  - <a href="https://docs.python.org/3/library/base64.html">base64</a> 
-  - <a href="https://docs.python.org/3/library/random.html">random</a> and <a href="https://docs.python.org/pt-br/3/library/string.html">string</a> (generate random string)
-- Outro:
-  - <a href="https://pypi.org/project/requests/">requests</a> (send HTTP request to the URL gaved)
-  - <a href="https://docs.python.org/3/library/os.html">os</a> and <a href="https://docs.python.org/3/library/sys.html">sys</a> (system libraries)
-  - <a href="https://docs.python.org/pt-br/3/library/getpass.html">getpass</a> (input)
-  - <a href="https://docs.python.org/3/library/time.html">time</a> (interval using sleep)
-
 ## Example
 <img src="./demo/demo.gif" height="50%" width="100%"><br>
 
 ## Contributing
 If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
 
-### Shoutouts
-- @carvalinh0 for helping me in the AES encryption.
-
-| [<img src="https://github.com/vlHan.png" width="115"><br><small>@vlHan</small>](https://github.com/vlHan) | [<img src="https://github.com/carvalinh0.png" width="115"><br><small>@carvalinh0</small>](https://github.com/carvalinh0) 
-| :---: | :---: | 
+## Shoutouts
+- <a href="https://github.com/carvalinh0/">carvalinh0</a> for helping me in the AES encryption.
 
 ## License 
 This project is under the [MIT License](LICENSE).
