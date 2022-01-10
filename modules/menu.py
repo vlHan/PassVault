@@ -269,7 +269,7 @@ class Menu:
 
                 else:
                     print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
-                    self.delete_all()
+                    self.delete_one()
 
             else:
                 print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
@@ -297,5 +297,5 @@ class Menu:
         elif confirm == "":
             return self.delete_all()
         else:
-            print(Fore.RED + "Invalid answer ")
+            print(Fore.RED + "Invalid answer.")
             return self.delete_all()
