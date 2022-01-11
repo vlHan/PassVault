@@ -12,24 +12,11 @@ import sqlite3
 
 class Menu:
     def __init__(self, master_pw: str) -> None:
-        """
-        Menu interface
-
-        Arguments
-            - master_pw [str] = master password
-
-        Variables
-            - db [class] = database class
-            - platform [str]
-            - mail [str]
-            - password [str]
-            - url [str]
-        """
         self._db = DataBase(master_pw)
-        self._platform = ""
-        self._mail = ""
-        self._password = ""
-        self._url = ""
+        self._platform = None
+        self._mail = None
+        self._password = None
+        self._url = None
 
     def __begin_informations(self) -> str:
         """
@@ -81,11 +68,7 @@ class Menu:
             sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
 
         elif want_gen == "y":
-            try:
-                return self.__generate_pass()
-            except CharNotLongEnough:
-                print(Fore.RED + "\nThe password is not long enough. Please try again.\n" + Style.RESET_ALL)
-                return self.__generate_pass()
+            return self.__generate_pass()
 
         elif want_gen == "n":
             self._password = getpass.getpass(prompt=f"Enter the password which you want to add for {self._platform} in the database (ex. password123): ").strip()
@@ -97,34 +80,28 @@ class Menu:
     def menu_interface(self) -> None:
         """
         Menu interface
-            - ask for a choice
 
         Raises 
-            DatabaseEmpty: the database is empty
             ConnectionError: request does not work 
         """
         banner()
         print(Fore.BLUE + " 1) Add a password" + Style.RESET_ALL)
         print(Fore.BLUE + " 2) Update informations" + Style.RESET_ALL)
         print(Fore.BLUE + " 3) Look up the password" + Style.RESET_ALL)
-        print(Fore.RED + " 4) Delete a password (normal/master)" +
-              Style.RESET_ALL)
+        print(Fore.RED + " 4) Delete a password (normal/master)" + Style.RESET_ALL)
         print(Fore.RED + " 5) Delete all normal passwords" + Style.RESET_ALL)
         print(Fore.RED + " 6) Exit the program" + Style.RESET_ALL)
 
-        ask = str(input("\n └──Enter a choice: ")).strip()
-        if ask == "1":
+        choice = str(input("\n └──Enter a choice: ")).strip()
+        if choice == "1":
             # add password
             self.__begin_informations()
             self._db.save_password(self._platform, self._mail,
                                   self._password, self._url)
 
-        elif ask == "2":
+        elif choice == "2":
             # update informations
-            try:
-                self._db.see_all()
-            except DatabaseEmpty:
-                print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+            self._db.see_all()
 
             option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
 
@@ -146,8 +123,7 @@ class Menu:
                         except sqlite3.ConnectionError:
                             # If the connection does not work, the URL is incorrect.
                             # Then the question will return
-                            print(Fore.RED + "\nInvalid URL. Please try again.\n" +
-                                  Style.RESET_ALL)
+                            print(Fore.RED + "\nInvalid URL. Please try again.\n" + Style.RESET_ALL)
                             time.sleep(1)
                             return self.menu_interface()
 
@@ -156,30 +132,27 @@ class Menu:
                 return self.menu_interface()
 
             id = str(
-                input(f"\nEnter the id of the {option}: "))
-            self._db.edit_password(option, new, id)
+                input(f"\nEnter the ID of the {option}: "))
+            return self._db.edit_password(option, new, id)
 
-        elif ask == "3":
+        elif choice == "3":
             # look up password
-            try:
-                self._db.see_all()
-            except DatabaseEmpty:
-                print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+            return self._db.see_all()
 
-        elif ask == "4":
+        elif choice == "4":
             # delete a password
-            self.delete_one()
+            return self.delete_one()
 
-        elif ask == "5":
+        elif choice == "5":
             # delete all passwords
-            self.delete_all()
+            return self.delete_all()
 
-        elif ask == "6":
+        elif choice == "6":
             # Exit
             banner()
             sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
 
-        elif ask == "exit":
+        elif choice == "exit":
             # If it is exit, the program will finish.
             sys.exit(Fore.RED + "Thanks for using." + Style.RESET_ALL)
 
@@ -193,14 +166,13 @@ class Menu:
         Returns
             - [str] A randomly generated password
 
-        Raises
-            CharNotLongEnough: the password is not long enough
         """
         pwd_len = int(input("What length would you like your password to be? "))
         pwd_count = int(input("How many passwords would you like? "))
 
         if pwd_len < 3:
-            raise CharNotLongEnough
+            print(Fore.RED + "\nThe password is not long enough. Please try again.\n" + Style.RESET_ALL)
+            return self.__generate_pass()
         else:
             print()
             for _ in range(pwd_count):
@@ -218,9 +190,6 @@ class Menu:
     def delete_one(self) -> None:
         """
         Delete a line of the table, a normal password or master password.
-
-        Raises 
-            DatabaseNotFound: the database was not found
         """
         delete_pwd = str(input("Do you want to delete a normal password or the master password? (normal/master) ").lower().strip())
 
@@ -237,6 +206,7 @@ class Menu:
                 id = str(input("Enter the id of the password which you want to delete: ")).strip()
 
                 self._db.delete_one(id)
+                print(Fore.GREEN +"\nThe password was deleted successfully.\n" + Style.RESET_ALL)
 
             elif delete_pwd == "master":
                 """Delete the master password and all the informations. It 
@@ -246,22 +216,17 @@ class Menu:
                     Fore.RED + 'NOTE: If you delete the master password you will lost all your sensitives data and will be logged out' + Style.RESET_ALL)
                 confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
                 if confirm == "y":
-                    try:
-                        self._db.delete_master()
-                        time.sleep(1)
+                    self._db.delete_master()
+                    time.sleep(1)
 
-                        print(Fore.GREEN + "Done. All the passwods including the master password had been deleted with success." + Style.RESET_ALL)
-                        time.sleep(1)
+                    print(Fore.GREEN + "Done. All the passwods including the master password had been deleted with success." + Style.RESET_ALL)
+                    time.sleep(1)
 
-                        print(Fore.RED + 'Now you will be logged out.' + Style.RESET_ALL)
-                        time.sleep(2)
+                    print(Fore.RED + 'Now you will be logged out.' + Style.RESET_ALL)
+                    time.sleep(2)
 
-                        banner()
-                        sys.exit(Fore.GREEN + 'Thanks for using.' + Style.RESET_ALL)
-
-                    except DatabaseNotFound:
-                        print(Fore.RED + 'Database was not found. Try to reload the program' + Style.RESET_ALL)
-                        return self.delete_one()
+                    banner()
+                    sys.exit(Fore.GREEN + 'Thanks for using.' + Style.RESET_ALL)
 
                 elif confirm == "n":
                     banner()
@@ -269,27 +234,21 @@ class Menu:
 
                 else:
                     print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
-                    self.delete_one()
+                    return self.delete_one()
 
             else:
                 print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
-                self.delete_one()
+                return self.delete_one()
 
     def delete_all(self):
         """
         Delete all passwords stored.
-
-        Raises 
-            DatabaseNotFound: the database was not found
         """
         confirm = (str(input(
             "Are you sure you want to delete all normal passwords? (Y/n) ")).strip().lower())
 
         if confirm == "y":
-            try:
-                self._db.delete_pwds()
-            except DatabaseEmpty:
-                print("\nThe database is empty. There are no passwords stored to delete.\n")
+            self._db.delete_pwds()
         elif confirm == "n":
             pass
         elif confirm == "exit":
