@@ -1,7 +1,7 @@
 # <a href="https://github.com/vlHan/PassVault"><img src="./demo/logo.png"></a>
 
 <p>
-   <img alt="Languages" src="https://img.shields.io/badge/Python-3.7%20%7C%203.8-blue.svg"> 
+   <img alt="Languages" src="https://img.shields.io/badge/Python->=3.0-blue.svg"> 
    <img alt="Repository size" src="https://img.shields.io/github/repo-size/vlHan/PassVault">
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
