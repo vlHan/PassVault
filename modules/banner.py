@@ -18,6 +18,5 @@ def banner() -> None:
                                             
     author: {__author__}
     version: {__version__}
-    GitHub: https://github.com/vlHan/PassVault""" + Style.RESET_ALL)
+    GitHub: https://github.com/vlHan/PassVault\n""" + Style.RESET_ALL)
 
-    print()
