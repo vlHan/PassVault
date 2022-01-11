@@ -12,7 +12,7 @@ try:
 except ImportError:
     import os
     os.system("pip install -r requirements.txt")
-    
+
 
 class Manager:
     def __init__(self) -> None:
@@ -27,9 +27,9 @@ class Manager:
 
         else:
             with sqlite3.connect('vault.db') as db: 
-                    cursor = db.cursor()
+                cursor = db.cursor()
+                
             if os.path.isfile('vault.db'):
-
                 try: 
                     cursor.execute("SELECT * FROM masterpassword")
                     for row in cursor.fetchall():
