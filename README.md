@@ -32,7 +32,7 @@ $ python3 .
 $ python3 PassVault
 ```
 
-**⚠️** The program needs all the files, be sure to have all the dependecies and files installed.
+**⚠️** The program needs all the files, be sure to have all the dependecies and files <a href="https://github.com/vlHan/PassVault#installation">installed</a>.
 
 ## How It Works
 
