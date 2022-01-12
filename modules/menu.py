@@ -7,10 +7,15 @@ import getpass
 import string
 import time
 import sys
-import sqlite3
 
 
 class Menu:
+    """
+    Menu class to grab informations from the user
+
+    Arguments
+        master_pw [str] -- master password
+    """
     def __init__(self, master_pw: str) -> None:
         self._db = DataBase(master_pw)
         self._platform = None
@@ -21,7 +26,6 @@ class Menu:
     def __begin_informations(self) -> str:
         """
         Required informations to begin the program
-            Inform what you will store.
 
         Returns
             Informations to store in the database  
@@ -32,7 +36,6 @@ class Menu:
         self._platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
         if self._platform == "exit":
-            banner()
             sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
 
         if self._platform.isnumeric() or self._platform.isspace():
@@ -53,7 +56,7 @@ class Menu:
                 # Make a request in the URL gaved.
                 requests.get(self._url)
 
-            except sqlite3.ConnectionError:
+            except requests.ConnectionError:
                 # If the connection does not work, the URL is incorrect.
                 # Then the question will return
                 print(Fore.RED + "Invalid URL." + Style.RESET_ALL)
@@ -87,7 +90,7 @@ class Menu:
         banner()
         print(Fore.BLUE + " 1) Add a password" + Style.RESET_ALL)
         print(Fore.BLUE + " 2) Update informations" + Style.RESET_ALL)
-        print(Fore.BLUE + " 3) Look up the password" + Style.RESET_ALL)
+        print(Fore.BLUE + " 3) Look up passwords" + Style.RESET_ALL)
         print(Fore.RED + " 4) Delete a password (normal/master)" + Style.RESET_ALL)
         print(Fore.RED + " 5) Delete all normal passwords" + Style.RESET_ALL)
         print(Fore.RED + " 6) Exit the program" + Style.RESET_ALL)
@@ -111,7 +114,7 @@ class Menu:
                 if option == "url":
                     if not new.startswith("http"):
                         print(
-                            Fore.RED + "\nInvalid URL. The URL must contain http:// or https:// in the beginning.\n" + Style.RESET_ALL)
+                            Fore.RED + "\nThe URL must contain http:// or https:// in the beginning.\n" + Style.RESET_ALL)
                         time.sleep(1)
                         return self.menu_interface()
 
@@ -120,7 +123,7 @@ class Menu:
                             # Make a request in the URL gaved.
                             requests.get(new)
 
-                        except sqlite3.ConnectionError:
+                        except requests.ConnectionError:
                             # If the connection does not work, the URL is incorrect.
                             # Then the question will return
                             print(Fore.RED + "\nInvalid URL. Please try again.\n" + Style.RESET_ALL)
@@ -132,7 +135,7 @@ class Menu:
                 return self.menu_interface()
 
             id = str(
-                input(f"\nEnter the ID of the {option}: "))
+                input(f"\nEnter the ID from the {option}: "))
             return self._db.edit_password(option, new, id)
 
         elif choice == "3":
@@ -160,11 +163,11 @@ class Menu:
             print(Fore.RED + "Invalid option." + Style.RESET_ALL)
             return self.menu_interface()
 
-    def __generate_pass(self):
+    def __generate_pass(self) -> None:
         """Returns generated password
 
         Returns
-            - [str] A randomly generated password
+            - [str] A random password
 
         """
         pwd_len = int(input("What length would you like your password to be? "))
@@ -191,7 +194,7 @@ class Menu:
         """
         Delete a line of the table, a normal password or master password.
         """
-        delete_pwd = str(input("Do you want to delete a normal password or the master password? (normal/master) ").lower().strip())
+        delete_pwd = str(input("Delete a normal password or the master password? (normal/master) ").lower().strip())
 
         if delete_pwd == "exit":
             sys.exit(Fore.RED + "Thanks for using." + Style.RESET_ALL)
@@ -201,16 +204,16 @@ class Menu:
             if delete_pwd == "normal":
                 """Delete a normal password stored in the database SQlite.
                 """
-                print(Fore.RED + 'NOTE: If you delete a normal password the information which is together will also be deleted.' + Style.RESET_ALL)
+                print(Fore.RED + 'NOTE: If you delete a normal password the information will be deleted.' + Style.RESET_ALL)
                 self._db.see_all()
-                id = str(input("Enter the id of the password which you want to delete: ")).strip()
+                id = str(input("Enter the ID of the password which you want to delete: ")).strip()
 
                 self._db.delete_one(id)
-                print(Fore.GREEN +"\nThe password was deleted successfully.\n" + Style.RESET_ALL)
+                print(Fore.GREEN +"\nThe password was successfully deleted.\n" + Style.RESET_ALL)
 
             elif delete_pwd == "master":
                 """Delete the master password and all the informations. It 
-                is not possible decrypt the data without the master password.
+                is not possible encrypt/decrypt the data without the master password.
                 """
                 print(
                     Fore.RED + 'NOTE: If you delete the master password you will lost all your sensitives data and will be logged out' + Style.RESET_ALL)
@@ -224,23 +227,19 @@ class Menu:
 
                     print(Fore.RED + 'Now you will be logged out.' + Style.RESET_ALL)
                     time.sleep(2)
-
-                    banner()
+                    
                     sys.exit(Fore.GREEN + 'Thanks for using.' + Style.RESET_ALL)
 
                 elif confirm == "n":
-                    banner()
-                    sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
+                    pass
 
                 else:
-                    print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
                     return self.delete_one()
 
             else:
-                print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
                 return self.delete_one()
 
-    def delete_all(self):
+    def delete_all(self) -> None:
         """
         Delete all passwords stored.
         """
