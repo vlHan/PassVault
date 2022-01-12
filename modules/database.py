@@ -4,7 +4,6 @@ from modules import *
 import sqlite3
 import time
 import os
-from colorama import Fore, Style 
 
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
@@ -47,26 +46,29 @@ class DataBase:
         Encrypt and save the data to a file using master password as the key
 
         Arguments
-            - pssw [str] = password to be encrypted 
-            - key [str]  = to encrypt and decrypt (masterpassword)
+            pssw [str] -- password to be encrypted 
+            key [str]  -- to encrypt and decrypt (masterpassword)
 
         Variables 
-            - cipher = cipher is the initialization vector to use for encryption or decryption.
-            - concatenate_bytes = returns the cypher text
-            - iv = initial value 
-            - concatenate
+            cipher -- cipher is the initialization vector to use for encryption or decryption.
+            concatenate_bytes -- returns the cypher text
+            iv -- initial value 
         """
         if not pssw:
             print(Fore.RED + 'The input cannot be empty. Please try again.' + Style.RESET_ALL)
             return 
 
         pssw = pssw.encode('utf-8')
+
         key = key.encode('utf-8')
+
         cipher = AES.new(key, AES.MODE_CBC)
+
         concatenate_bytes = cipher.encrypt(pad(pssw, AES.block_size))
 
         # pass the initial_value to base64
         iv = b64encode(cipher.iv).decode('utf-8')
+
         concatenate = b64encode(concatenate_bytes).decode('utf-8')  # cyphertext to base64
 
         return (iv, concatenate)
@@ -79,10 +81,13 @@ class DataBase:
             The initial_value text        
         """
         initial_value = b64decode(initial_value)
+
         concatenate = b64decode(ciphertext)
+
         key = key.encode('utf-8')
 
         cipher = AES.new(key, AES.MODE_CBC, initial_value)
+
         # try decrypt the cypher text
         pt = unpad(cipher.decrypt(concatenate), AES.block_size)
         
@@ -109,6 +114,7 @@ class DataBase:
 
             infos = list()
             stored_infos = [platform, mail, password, url]
+            
             for i in stored_infos:
                 initial_value, contatenate = self.encryption(i, self.master_pssw[0:32])
                 concatenate = initial_value + "|" + contatenate
@@ -125,9 +131,9 @@ class DataBase:
         Update values in the database SQlite.
 
         Arguments: 
-            option [str] = what need to be changed
-            new [str] = the new password
-            id [str] = the id of the data
+            option [str] -- what need to be changed
+            new [str] -- the new password
+            id [str] -- the id of the data
 
         Returns
             [str] the new password changed in the database
@@ -148,7 +154,7 @@ class DataBase:
         See all passwords stored in the database.
 
         Returns
-            - [tuple] The passwords stored
+            [tuple] The passwords stored
         """
 
         self.cursor.execute("SELECT COUNT(*) from passwords;")
