@@ -37,7 +37,7 @@ class DataBase:
         for row in self.cursor.fetchall():
             # Select the salt of the master password
             self.salt = row[1] 
-        # Here I am putting together the master password with the salt 
+        # Putting together the master password with the salt 
         # to use in the verificantion and in the encryption and decryption 
         self.master_pssw = master_pssw + self.salt
 
