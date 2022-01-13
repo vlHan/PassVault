@@ -15,8 +15,8 @@ class DataBase:
     DataBase is the class which contains database SQlite
     functions and encryption using AES and base 64.
     
-    If has an error which should not exist, please report it at 
-    https://github.com/vlHan/PassVault/issues
+    If has an error which should not exist, please report 
+    it at https://github.com/vlHan/PassVault/issues
     """
 
     def __init__(self, master_pssw: str) -> None:
@@ -41,7 +41,7 @@ class DataBase:
         self.master_pssw = master_pssw + self.salt
 
 
-    def encryption(self, pssw: str, key: str) -> None:
+    def encryption(self, pssw: str, key: str) -> str:
         """
         Encrypt and save the data to a file using master password as the key
 
@@ -49,10 +49,8 @@ class DataBase:
             pssw [str] -- password to be encrypted 
             key [str]  -- to encrypt and decrypt (masterpassword)
 
-        Variables 
-            cipher -- cipher is the initialization vector to use for encryption or decryption.
-            concatenate_bytes -- returns the cypher text
-            iv -- initial value 
+        Return 
+            [str] initial value and the cyphertext in base64 (concatenate string)
         """
         if not pssw:
             print(Fore.RED + 'The input cannot be empty. Please try again.' + Style.RESET_ALL)
@@ -73,12 +71,17 @@ class DataBase:
 
         return (iv, concatenate)
 
-    def decryption(self, initial_value: str, ciphertext: str, key: str) -> None:
+    def decryption(self, initial_value: str, ciphertext: str, key: str) -> str:
         """
         Encrypt data using master password as the key
 
+        Arguments
+            initial_value [str] -- the value to pass to base64
+            ciphertext [str]  -- to encrypt and decrypt (masterpassword)
+            key [str] -- the key to encrypt/decrypt passwords
+
         Returns 
-            The initial_value text        
+            [str] The cypher text decrypted      
         """
         initial_value = b64decode(initial_value)
 
@@ -96,6 +99,12 @@ class DataBase:
     def save_password(self, platform: str, mail: str, password: str, url: str) -> None:
         """
         Add values in the Database SQlite.
+
+        Arguments 
+            platform [str] -- the platform of the password
+            mail [str] -- email of the account
+            password [str] -- password of the account to save in the database
+            url [str] -- URL of the platform
         """
         if os.path.isfile("vault.db"):
             self.cursor.execute("SELECT id FROM passwords;")
@@ -136,7 +145,7 @@ class DataBase:
             id [str] -- the id of the data
 
         Returns
-            [str] the new password changed in the database
+            [str] The new password changed in the database
         """
         if os.path.isfile('vault.db'):
             initial_value, concatenate = self.encryption(new, self.master_pssw[0:32])
