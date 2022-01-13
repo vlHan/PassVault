@@ -43,7 +43,10 @@ After following the steps, the code will store your datas, encrypted in AES encr
 
 ```py
 if os.path.isfile('vault.db'): # verify if the database exist
+      with sqlite3.connect('vault.db') as db: # connect with the database
+          cursor = db.cursor()
       cursor.execute("SELECT * FROM masterpassword") # select the stored data 
+      
       for row in cursor.fetchall(): 
           master = row[0] 
           salt = row[1] 
