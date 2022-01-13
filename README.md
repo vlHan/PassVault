@@ -9,7 +9,7 @@
 It is a command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQlite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
 
 ## Installation
-Clone this repository: `git clone https://github.com/vlHan/PassVault` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
+Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
 - Enter the folder: `cd PassVault/`
 - Install python3 
   - Linux
