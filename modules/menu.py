@@ -183,11 +183,11 @@ class Menu:
                                             string.ascii_lowercase + string.punctuation) for _ in range(pwd_len)))
             enter_pw = str(
                 input("Do you want to use this password? (Y/n) ")).lower().strip()
-            if enter_pw == 'y' and not enter_pw.isspace() or not enter_pw == "":
+            if enter_pw == 'y':
                 self._password = enter_pw
 
-            elif enter_pw == 'n' and not enter_pw.isspace() or not enter_pw == "": 
-                print('Returning to the beginning...')
+            elif enter_pw == 'n': 
+                print(f'\n{Fore.RED}Returning to the beginning...{Style.RESET_ALL}\n')
                 return self.__begin_informations()
 
             else:
