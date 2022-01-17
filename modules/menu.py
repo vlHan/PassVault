@@ -170,21 +170,25 @@ class Menu:
             - [str] A random password
 
         """
-        pwd_len = int(input("What length would you like your password to be? "))
-        pwd_count = int(input("How many passwords would you like? "))
+        pwd_len = int(input("What length would you like your password to be? (At least 8) "))
 
-        if pwd_len < 3:
+        if pwd_len < 8:
             print(Fore.RED + "\nThe password is not long enough. Please try again.\n" + Style.RESET_ALL)
             return self.__generate_pass()
         else:
             print()
-            for _ in range(pwd_count):
+            for _ in range(1):
+                print(f'{Fore.YELLOW}Password for {self._platform}:', end=' ' + f'{Style.RESET_ALL}')
                 print(''.join(random.choice(string.ascii_uppercase + string.digits +
                                             string.ascii_lowercase + string.punctuation) for _ in range(pwd_len)))
             enter_pw = str(
-                input("Enter the password generated which you want to use: ")).strip()
-            if not enter_pw.isspace() or not enter_pw == "":
+                input("Do you want to use this password? (Y/n) ")).lower().strip()
+            if enter_pw == 'y' and not enter_pw.isspace() or not enter_pw == "":
                 self._password = enter_pw
+
+            elif enter_pw == 'n' and not enter_pw.isspace() or not enter_pw == "": 
+                print('Returning to the beginning...')
+                return self.__begin_informations()
 
             else:
                 print(Fore.RED + "Enter a valid answer." + Style.RESET_ALL)
