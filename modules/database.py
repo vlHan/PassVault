@@ -133,7 +133,7 @@ class DataBase:
             self.datab.commit()
 
             print(
-                Fore.GREEN + "\nThank you! Datas were added successfully.\n" + Style.RESET_ALL)
+                Fore.GREEN + "\nThank you! Datas were added successfully." + Style.RESET_ALL)
 
     def edit_password(self, option: str, new: str, id: int) -> None:
         """
