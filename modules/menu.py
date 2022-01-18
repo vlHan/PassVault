@@ -42,8 +42,8 @@ class Menu:
             print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
             return self.__begin_informations()
 
-        self._mail = str(input(f"Enter the email for this account: ")).lower().strip()
-        self._url = str(input(f"Enter the URL of the website (ex. https://google.com): ")).lower().strip()
+        self._mail = str(input("Enter the email for this account: ")).lower().strip()
+        self._url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
 
         if not self._url.startswith("http"):
             print(Fore.RED + "Invalid URL. The URL must contain http:// or https:// in the beginning." + Style.RESET_ALL)
@@ -108,31 +108,29 @@ class Menu:
 
             option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
 
-            if option == "platform" or "email" or "password" or "url":
-                new = str(input(f"\nEnter the new {option} which you want add in the database: ")).strip()
-
-                if option == "url":
-                    if not new.startswith("http"):
-                        print(
-                            Fore.RED + "\nThe URL must contain http:// or https:// in the beginning.\n" + Style.RESET_ALL)
-                        time.sleep(1)
-                        return self.menu_interface()
-
-                    elif new.startswith("http"):
-                        try:
-                            # Make a request in the URL gaved.
-                            requests.get(new)
-
-                        except requests.ConnectionError:
-                            # If the connection does not work, the URL is incorrect.
-                            # Then the question will return
-                            print(Fore.RED + "\nInvalid URL. Please try again.\n" + Style.RESET_ALL)
-                            time.sleep(1)
-                            return self.menu_interface()
-
-            else:
+            if option != "platform" | "email" | "password" | "url":
                 print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
                 return self.menu_interface()
+
+            new = str(input(f"\nEnter the new {option} which you want add in the database: ")).strip()
+            if option == "url":
+                if not new.startswith("http"):
+                    print(
+                        Fore.RED + "\nThe URL must contain http:// or https:// in the beginning.\n" + Style.RESET_ALL)
+                    time.sleep(1)
+                    return self.menu_interface()
+
+                elif new.startswith("http"):
+                    try:
+                        # Make a request in the URL gaved.
+                        requests.get(new)
+
+                    except requests.ConnectionError:
+                        # If the connection does not work, the URL is incorrect.
+                        # Then the question will return
+                        print(Fore.RED + "\nInvalid URL. Please try again.\n" + Style.RESET_ALL)
+                        time.sleep(1)
+                        return self.menu_interface()
 
             id = str(
                 input(f"\nEnter the ID from the {option}: "))

@@ -91,10 +91,7 @@ class DataBase:
 
         cipher = AES.new(key, AES.MODE_CBC, initial_value)
 
-        # try decrypt the cypher text
-        pt = unpad(cipher.decrypt(concatenate), AES.block_size)
-        
-        return pt
+        return unpad(cipher.decrypt(concatenate), AES.block_size) # try decrypt the cypher text
 
     def save_password(self, platform: str, mail: str, password: str, url: str) -> None:
         """
@@ -121,11 +118,11 @@ class DataBase:
                     id += 1
                     break 
 
-            infos = list()
+            infos = []
             stored_infos = [platform, mail, password, url]
-            
+
             for i in stored_infos:
-                initial_value, contatenate = self.encryption(i, self.master_pssw[0:32])
+                initial_value, contatenate = self.encryption(i, self.master_pssw[:32])
                 concatenate = initial_value + "|" + contatenate
                 infos.append(concatenate)
             # Insert each value in the table passwords
@@ -148,7 +145,7 @@ class DataBase:
             [str] The new password changed in the database
         """
         if os.path.isfile('vault.db'):
-            initial_value, concatenate = self.encryption(new, self.master_pssw[0:32])
+            initial_value, concatenate = self.encryption(new, self.master_pssw[:32])
             ct_new_info = initial_value + "|" + concatenate
             
             self.cursor.execute(f"""UPDATE passwords SET {option} = '{ct_new_info}' WHERE id = '{id}'""")
@@ -176,25 +173,25 @@ class DataBase:
         else:
             print()
             if os.path.isfile("vault.db"):
-                infos = list()
+                infos = []
                 for row in self.cursor.execute("SELECT * FROM passwords;"):
                     infos.append(row[1])
                     infos.append(row[2])
                     infos.append(row[3])
                     infos.append(row[4])
 
-                    decrypted = list()
-                    for i in infos:
-                        decrypted.append(
-                            self.decryption(
-                                str(i).split("|")[0], 
-                                str(i).split("|")[1],
-                                self.master_pssw[0:32]
-                        ))
+                    decrypted = [
+                        self.decryption(
+                            str(i).split("|")[0], 
+                            str(i).split("|")[1],
+                            self.master_pssw[:32]
+                        )
+                        for i in infos
+                    ]
                     
                     infos.clear()
 
-                    print(f"ID: {row[0]}\nPlatform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n")
+                    print(f"ID: {row[0]}\nPlatform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}")
 
             else:
                 print(Fore.RED + 'Database was not found.' + Style.RESET_ALL)
