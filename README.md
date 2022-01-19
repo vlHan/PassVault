@@ -69,4 +69,6 @@ If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
 - <a href="https://github.com/carvalinh0/">carvalinh0</a> for helping me in the AES encryption.
 
 ## License 
+Copyright 2022 vlHan
+
 This project is under the [MIT License](LICENSE).
