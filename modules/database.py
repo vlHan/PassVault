@@ -220,7 +220,7 @@ class DataBase:
             print("Removing...")
             time.sleep(2)
 
-            # Dropping the databale
+            # Dropping the datable
             self.cursor.execute("DROP TABLE passwords;")
             self.datab.commit()
 
