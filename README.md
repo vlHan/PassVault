@@ -35,9 +35,19 @@ $ python3 PassVault
 **⚠️** The program needs all the files, be sure to have all the dependecies and files <a href="https://github.com/vlHan/PassVault#installation">installed</a>.
 
 ## How It Works
+When running, the program will ask to create a master password. This master password will be encrypted and this key will be used to indenty if the user is actually you, be sure you have saved, because the master password is **unrecoverable**.
 
-1. After running you need to create your master password. This master password will be encrypted and this key will be used to indenty if the user is actually you, be sure you have saved, because the master password is **unrecoverable**.
-2. Follow the steps and answer the inputs, these informations will be saved. 
+### The master password must contains: 
+  - At least eight characters
+    - It will let your master password a safety and strong password.
+  - Only a word without any space
+    - The master password must be one (or more) word without any space, otherwise it will get error when verifying.
+      - Because the code automatically remove the spaces using strip()
+  - Can have numbers and speacial characters
+    - Numbers and special characters is viable, because this will reinforce your password
+      - But it cannot have just numbers
+    
+### AES Encryption and verification
 
 After following the steps, the code will store your datas, encrypted in AES encryption, that comes from a python library [pycryptodome](https://pypi.org/project/pycryptodome/), in a SQlite file. To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function for the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
 
