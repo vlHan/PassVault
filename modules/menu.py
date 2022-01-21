@@ -31,12 +31,12 @@ class Menu:
             Informations to store in the database  
 
         Raises 
-            ConnectionError: request does not work 
+            ConnectionError -- request does not work 
         """
         self._platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
         if self._platform == "exit":
-            sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
+            sys.exit(Fore.CYAN + "Thanks for using." + Style.RESET_ALL)
 
         if self._platform.isnumeric() or self._platform.isspace():
             print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
@@ -68,7 +68,7 @@ class Menu:
         # Generate a password for a platform.
         if want_gen == "exit":
             banner()
-            sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
+            sys.exit(Fore.CYAN + "Thanks for using." + Style.RESET_ALL)
 
         elif want_gen == "y":
             return self.__generate_pass()
@@ -85,7 +85,7 @@ class Menu:
         Menu interface
 
         Raises 
-            ConnectionError: request does not work 
+            ConnectionError -- request does not work 
         """
         banner()
         print(Fore.BLUE + " 1) Add a password" + Style.RESET_ALL)
@@ -107,12 +107,8 @@ class Menu:
             self._db.see_all()
 
             option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
-
-            if option != "platform" | "email" | "password" | "url":
-                print(Fore.RED + "Enter a valid answer" + Style.RESET_ALL)
-                return self.menu_interface()
-
             new = str(input(f"\nEnter the new {option} which you want add in the database: ")).strip()
+
             if option == "url":
                 if not new.startswith("http"):
                     print(
@@ -151,11 +147,11 @@ class Menu:
         elif choice == "6":
             # Exit
             banner()
-            sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
+            sys.exit(Fore.CYAN + "Thanks for using." + Style.RESET_ALL)
 
         elif choice == "exit":
             # If it is exit, the program will finish.
-            sys.exit(Fore.RED + "Thanks for using." + Style.RESET_ALL)
+            sys.exit(Fore.CYAN + "Thanks for using." + Style.RESET_ALL)
 
         else:
             print(Fore.RED + "Invalid option." + Style.RESET_ALL)
@@ -165,7 +161,7 @@ class Menu:
         """Returns generated password
 
         Returns
-            - [str] A random password
+            [str] -- A random password
 
         """
         pwd_len = int(input("What length would you like your password to be? (At least 8) "))
@@ -199,46 +195,33 @@ class Menu:
         delete_pwd = str(input("Delete a normal password or the master password? (normal/master) ").lower().strip())
 
         if delete_pwd == "exit":
-            sys.exit(Fore.RED + "Thanks for using." + Style.RESET_ALL)
+            sys.exit(Fore.CYAN + "Thanks for using." + Style.RESET_ALL)
+
         elif delete_pwd == "":
             return self.delete_one()
-        else:
-            if delete_pwd == "normal":
-                """Delete a normal password stored in the database SQlite.
-                """
-                print(Fore.RED + 'NOTE: If you delete a normal password the information will be deleted.' + Style.RESET_ALL)
-                self._db.see_all()
-                id = str(input("Enter the ID of the password which you want to delete: ")).strip()
 
-                self._db.delete_one(id)
-                print(Fore.GREEN +"\nThe password was successfully deleted.\n" + Style.RESET_ALL)
+        elif delete_pwd == "normal":
+            print(Fore.RED + 'NOTE: If you delete a normal password the information will be deleted.' + Style.RESET_ALL)
+            self._db.see_all()
+            id = str(input("Enter the ID of the password which you want to delete: ")).strip()
+            self._db.delete_one(id)
+            
+            print(Fore.GREEN +"\nThe password was successfully deleted.\n" + Style.RESET_ALL)
 
-            elif delete_pwd == "master":
-                """Delete the master password and all the informations. It 
-                is not possible encrypt/decrypt the data without the master password.
-                """
-                print(
-                    Fore.RED + 'NOTE: If you delete the master password you will lost all your sensitives data and will be logged out' + Style.RESET_ALL)
-                confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
-                if confirm == "y":
-                    self._db.delete_master()
-                    time.sleep(1)
+        elif delete_pwd == "master":
+            print(
+                Fore.RED + 'NOTE: If you delete the master password you will lost all your sensitives data and will be logged out' + Style.RESET_ALL)
+            confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
 
-                    print(Fore.GREEN + "Done. All the passwods including the master password had been deleted with success." + Style.RESET_ALL)
-                    time.sleep(1)
-
-                    print(Fore.RED + 'Now you will be logged out.' + Style.RESET_ALL)
-                    time.sleep(2)
-                    
-                    sys.exit(Fore.GREEN + 'Thanks for using.' + Style.RESET_ALL)
-
-                elif confirm == "n":
-                    pass
-
-                else:
-                    return self.delete_one()
-
-            else:
+            if confirm == "y":
+                self._db.delete_master()
+                time.sleep(1)
+                print(Fore.GREEN + "Done. All the passwods including the master password had been deleted with success." + Style.RESET_ALL)
+                print(Fore.RED + 'Now you will be logged out.' + Style.RESET_ALL)
+                time.sleep(2)
+                sys.exit(Fore.CYAN + 'Thanks for using.' + Style.RESET_ALL)
+            
+            elif confirm != "n": 
                 return self.delete_one()
 
     def delete_all(self) -> None:
@@ -253,7 +236,7 @@ class Menu:
         elif confirm == "n":
             pass
         elif confirm == "exit":
-            sys.exit(Fore.GREEN + "Thanks for using." + Style.RESET_ALL)
+            sys.exit(Fore.CYAN + "Thanks for using." + Style.RESET_ALL)
         elif confirm == "":
             return self.delete_all()
         else:

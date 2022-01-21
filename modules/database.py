@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from modules import *
 
 import sqlite3
@@ -168,33 +169,32 @@ class DataBase:
 
         if result[0][0] == 0:
             # verify if the database is empty - cannot opperate in a empty database
-            print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+            sys.exit(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+
+        print()
+        if os.path.isfile("vault.db"):
+            infos = []
+            for row in self.cursor.execute("SELECT * FROM passwords;"):
+                infos.append(row[1])
+                infos.append(row[2])
+                infos.append(row[3])
+                infos.append(row[4])
+
+                decrypted = [
+                    self.decryption(
+                        str(i).split("|")[0], 
+                        str(i).split("|")[1],
+                        self.master_pssw[:32]
+                    )
+                    for i in infos
+                ]
+                
+                infos.clear()
+
+                print(f"ID: {row[0]}\nPlatform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}")
 
         else:
-            print()
-            if os.path.isfile("vault.db"):
-                infos = []
-                for row in self.cursor.execute("SELECT * FROM passwords;"):
-                    infos.append(row[1])
-                    infos.append(row[2])
-                    infos.append(row[3])
-                    infos.append(row[4])
-
-                    decrypted = [
-                        self.decryption(
-                            str(i).split("|")[0], 
-                            str(i).split("|")[1],
-                            self.master_pssw[:32]
-                        )
-                        for i in infos
-                    ]
-                    
-                    infos.clear()
-
-                    print(f"ID: {row[0]}\nPlatform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}")
-
-            else:
-                print(Fore.RED + 'Database was not found.' + Style.RESET_ALL)
+            print(Fore.RED + 'Database was not found.' + Style.RESET_ALL)
 
     def delete_one(self, id: str) -> None:
         self.cursor.execute(f"DELETE from passwords WHERE id = '{id}'")
