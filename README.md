@@ -6,7 +6,7 @@
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
 
-It is a command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQlite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
+Command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQLite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
 
 ## Installation
 Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
@@ -37,48 +37,79 @@ $ python3 PassVault
 ## How It Works
 When running, the program will ask to create a master password. This master password will be encrypted and this key will be used to indenty if the user is actually you, be sure you have saved, because the master password is **unrecoverable**.
 
-### The master password must contains: 
-  - At least eight characters
-    - It will let your master password a safety and strong password.
-  - Only a word without any space
-    - The master password must be one (or more) word without any space, otherwise it will get error when verifying.
-      - Because the code automatically remove the spaces using strip()
-  - Can have numbers and speacial characters
-    - Numbers and special characters is viable, because this will reinforce your password
-      - But it cannot have just numbers
-    
-### AES Encryption and verification
+### Master password must contains: 
+#### 1. Eight characters
+  - It will let your master password a safety and strong password.
 
-After following the steps, the code will store your datas, encrypted in AES encryption, that comes from a python library [pycryptodome](https://pypi.org/project/pycryptodome/), in a SQlite file. To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function for the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
+#### 2. No space
+  - The master password must be one (or more) word without any space.
+    - Otherwise it will get error when saving and verifying.
+
+#### 3. Numbers and speacial characters
+  - Numbers and special characters is viable, because this will reinforce your password
+    - But it cannot have just numbers
+
+### Hash Verification
+To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function as the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
 
 ```py
 if os.path.isfile('vault.db'): # verify if the database exist
-      with sqlite3.connect('vault.db') as db: # connect with the database
-          cursor = db.cursor()
-      cursor.execute("SELECT * FROM masterpassword") # select the stored data 
-      
-      for row in cursor.fetchall(): 
-          master = row[0] 
-          salt = row[1] 
-      
-      self.master_pw = getpass.getpass('Enter your master password: ') # ask the master password
-      h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function
+    with sqlite3.connect('vault.db') as db: # connect with the database
+        cursor = db.cursor()
+    cursor.execute("SELECT * FROM masterpassword") # select the stored data 
+    
+    for row in cursor.fetchall(): 
+        master = row[0] 
+        salt = row[1] 
+    
+    self.master_pw = getpass.getpass('Enter your master password: ') # ask the master password
+    h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function
 
-      # compare the hashes
-      if h == master:
-        # rest of the program
+    # compare the hashes
+    if h == master:
+      # rest of the program
+```
+
+### AES Encryption
+The encryption method used in this program comes from the python library [PyCryptoDome](https://pypi.org/project/pycryptodome/). This program uses AES encryption methods to store sensitive data (in this case passwords) into a SQLite database.
+
+### SQLite Functions
+The SQLite database is used to store sensitive data, as mentioned above, this type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is lost, you only need the password manager to be able to see the stored passwords.
+
+```py
+if os.path.isfile("vault.db"): # verify if the database is created
+    self.cursor.execute("SELECT id FROM passwords;") # select the ID
+    id = len(self.cursor.fetchall()) # the ID must be the length of the datas stored in the database plus one
+
+    while True:
+        if id in self.cursor.execute("SELECT id FROM passwords;"):
+            # verify if the ID exist in the database
+            # if exist the code will add one more
+            id += 1
+        else: 
+            id += 1
+            break 
+
+    infos = []
+    stored_infos = [platform, mail, password, url]
+
+    for i in stored_infos:
+        initial_value, contatenate = self.encryption(i, self.master_pssw[:32])
+        concatenate = initial_value + "|" + contatenate
+        infos.append(concatenate)
+
+    self.cursor.execute(f"""INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')""") # insert each value in the table
+    self.datab.commit() # commit in the database
 ```
 
 ## Example
 <img src="./demo/demo.gif" height="50%" width="100%"><br>
 
 ## Contributing
-If you want to contribute see [guidelines for contributing](CONTRIBUTING.md).
+To contribute see [guidelines for contributing](CONTRIBUTING.md).
 
 ## Shoutouts
 - <a href="https://github.com/carvalinh0/">carvalinh0</a> for helping me in the AES encryption.
 
 ## License 
-Copyright 2022 vlHan
-
 This project is under the [MIT License](LICENSE).
