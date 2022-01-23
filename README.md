@@ -64,39 +64,13 @@ The encryption method used in this program comes from the python library [PyCryp
 ### SQLite Functions
 The SQLite database is used to store sensitive data, as mentioned above, this type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is localy lost, you only need the password manager to be able to decrypt the passwords stored in your backup database.
 
-```py
-if os.path.isfile("vault.db"): # verify if the database is created
-    self.cursor.execute("SELECT id FROM passwords;") # select the ID
-    id = len(self.cursor.fetchall()) # the ID must be the length of the datas stored in the database plus one
-
-    while True:
-        if id in self.cursor.execute("SELECT id FROM passwords;"):
-            # verify if the ID exist in the database
-            # if exist the code will add one more
-            id += 1
-        else: 
-            id += 1
-            break 
-
-    infos = []
-    stored_infos = [platform, mail, password, url]
-
-    for i in stored_infos:
-        initial_value, contatenate = self.encryption(i, self.master_pssw[:32])
-        concatenate = initial_value + "|" + contatenate
-        infos.append(concatenate)
-
-    self.cursor.execute(f"""INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')""") # insert each value in the table
-    self.datab.commit() # commit in the database
-```
-
 ## Example
 <img src="./demo/demo.gif" height="50%" width="100%"><br>
 
 ## Contributing
 To contribute see [guidelines for contributing](CONTRIBUTING.md).
 
-## Shoutouts
+### Shoutouts
 - <a href="https://github.com/carvalinh0/">carvalinh0</a> for helping me in the AES encryption.
 
 ## License 
