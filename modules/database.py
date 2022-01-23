@@ -273,6 +273,7 @@ class DataBase:
                 self.cursor.execute("DROP TABLE masterpassword;")
                 self.datab.commit()
                 self.datab.close()
+                os.remove('vault.db')
 
             except sqlite3.Error:
                 raise
