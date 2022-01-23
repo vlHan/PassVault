@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import sys
 from modules import *
 
 import sqlite3
 import time
+
 import os
+from sys import exit
 
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
@@ -23,6 +24,8 @@ class DataBase:
     def __init__(self, master_pssw: str) -> None:
         self.datab = sqlite3.connect("vault.db")
         self.cursor = self.datab.cursor()
+        self.checkmark_ = '\u2713'
+        self.xmark_ = '\u2717'
         # Connect with the SQlite and create the table.
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS passwords (
@@ -42,7 +45,7 @@ class DataBase:
         self.master_pssw = master_pssw + self.salt
 
 
-    def encryption(self, pssw: str, key: str) -> str:
+    def encryption(self, pssw: str, key: str) -> tuple:
         """
         Encrypt and save the data to a file using master password as the key
 
@@ -58,16 +61,12 @@ class DataBase:
             return 
 
         pssw = pssw.encode('utf-8')
-
         key = key.encode('utf-8')
-
         cipher = AES.new(key, AES.MODE_CBC)
-
         concatenate_bytes = cipher.encrypt(pad(pssw, AES.block_size))
 
         # pass the initial_value to base64
         iv = b64encode(cipher.iv).decode('utf-8')
-
         concatenate = b64encode(concatenate_bytes).decode('utf-8')  # cyphertext to base64
 
         return (iv, concatenate)
@@ -85,11 +84,8 @@ class DataBase:
             [str] The cypher text decrypted      
         """
         initial_value = b64decode(initial_value)
-
         concatenate = b64decode(ciphertext)
-
         key = key.encode('utf-8')
-
         cipher = AES.new(key, AES.MODE_CBC, initial_value)
 
         return unpad(cipher.decrypt(concatenate), AES.block_size) # try decrypt the cypher text
@@ -130,8 +126,7 @@ class DataBase:
             self.cursor.execute(f"""INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')""")
             self.datab.commit()
 
-            print(
-                Fore.GREEN + "\nThank you! Datas were added successfully." + Style.RESET_ALL)
+            print(f"{Fore.GREEN}\n{self.checkmark_} Thank you! Datas were added successfully.{Style.RESET_ALL}")
 
     def edit_password(self, option: str, new: str, id: int) -> None:
         """
@@ -150,13 +145,13 @@ class DataBase:
             ct_new_info = initial_value + "|" + concatenate
             
             self.cursor.execute(f"""UPDATE passwords SET {option} = '{ct_new_info}' WHERE id = '{id}'""")
-            print(Fore.GREEN + f"The {option} has successfully changed to {new}." + Style.RESET_ALL)
             self.datab.commit()
+            print(f"{Fore.GREEN}{self.checkmark_} The {option} has successfully changed to {new}.{Style.RESET_ALL}")
 
         else:
-            print(Fore.RED + 'Database was not found.' + Style.RESET_ALL)
+            print(f'{Fore.RED}{self.xmark_} Database was not found.{Style.RESET_ALL}')
 
-    def see_all(self) -> None:
+    def look_up(self, id: str) -> None:
         """
         See all passwords stored in the database.
 
@@ -169,12 +164,12 @@ class DataBase:
 
         if result[0][0] == 0:
             # verify if the database is empty - cannot opperate in a empty database
-            sys.exit(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+            exit(f"{Fore.RED}\nThe database is empty. Try adding a password.{Style.RESET_ALL}")
 
         print()
         if os.path.isfile("vault.db"):
             infos = []
-            for row in self.cursor.execute("SELECT * FROM passwords;"):
+            for row in self.cursor.execute(f"SELECT * FROM passwords WHERE id = '{id}';"):
                 infos.append(row[1])
                 infos.append(row[2])
                 infos.append(row[3])
@@ -191,10 +186,45 @@ class DataBase:
                 
                 infos.clear()
 
-                print(f"ID: {row[0]}\nPlatform: {decrypted[0].decode()}\nEmail: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}")
+                print(f"{Fore.YELLOW}[ID: {row[0]}] Platform --{decrypted[0].decode()}\n{Fore.GREEN}Email: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n{Style.RESET_ALL}")
 
         else:
-            print(Fore.RED + 'Database was not found.' + Style.RESET_ALL)
+            print(f'{Fore.RED}{self.xmark_} Database was not found.{Fore.RED}')
+
+    def stored_passwords(self): 
+        """Stored passwords
+        """
+        try:
+            self.cursor.execute("SELECT COUNT(*) from passwords;")
+        except sqlite3.OperationalError: 
+            pass
+
+        result = self.cursor.fetchall()
+
+        if result[0][0] != 0:
+            print(f'{Fore.YELLOW}Current passwords stored:{Style.RESET_ALL}')
+
+            if os.path.isfile("vault.db"):
+                infos = []
+
+                for row in self.cursor.execute("SELECT * FROM passwords;"):
+                    infos.append(row[1])
+                    infos.append(row[2])
+
+                    decrypted = [
+                        self.decryption(
+                            str(i).split("|")[0], 
+                            str(i).split("|")[1],
+                            self.master_pssw[:32]
+                        )
+                        for i in infos
+                    ]
+                    
+                    infos.clear()
+                    print(f"{Fore.YELLOW}[ID: {row[0]}] Platform  --{decrypted[0].decode()}{Style.RESET_ALL}")
+
+            else:
+                print(f'{Fore.RED}{self.xmark_} Database was not found.{Fore.RED}')
 
     def delete_one(self, id: str) -> None:
         self.cursor.execute(f"DELETE from passwords WHERE id = '{id}'")
@@ -211,12 +241,12 @@ class DataBase:
         self.cursor.execute("SELECT COUNT(*) from passwords;")
         result = self.cursor.fetchall()
 
-        # verify if the database is empty - cannot opperate in a empty database
-        if result[0][0] == 0:
-            print(Fore.RED + "\nThe database is empty. Try adding a password." + Style.RESET_ALL)
+        if result[0][0] == 0: 
+            # verify if the database is empty - cannot opperate in a empty database
+            print(f"{Fore.RED}\n{self.xmark_} The database is empty. Try adding a password.{Style.RESET_ALL}")
 
         else:
-            print(Fore.RED + "Deleting all data... (database)" + Style.RESET_ALL)
+            print(f"{Fore.RED}Deleting all data... (database){Style.RESET_ALL}")
             print("Removing...")
             time.sleep(2)
 
@@ -225,7 +255,7 @@ class DataBase:
             self.datab.commit()
 
             time.sleep(1)
-            print(Fore.GREEN + "Done. All the passwords stored had been deleted with success." + Style.RESET_ALL)
+            print(f"{Fore.GREEN}{self.checkmark_} Done. All the passwords stored had been deleted with success.{Style.RESET_ALL}")
 
     def delete_master(self) -> None:
         """Delete the master password and all the informations. It 
@@ -235,7 +265,7 @@ class DataBase:
             The database SQlitefile empty (.db)
         """
         if os.path.isfile('vault.db'):
-            print(Fore.RED + "Deleting all the passwords..." + Style.RESET_ALL)
+            print(f"{Fore.RED}Deleting all the passwords...{Style.RESET_ALL}")
             time.sleep(1)
             
             try:
@@ -248,4 +278,4 @@ class DataBase:
                 raise
 
         else:
-            print(Fore.RED + 'Database was not found.' + Style.RESET_ALL)
+            print(f'{Fore.RED}{self.xmark_} Database was not found.{Style.RESET_ALL}')

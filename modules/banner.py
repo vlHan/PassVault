@@ -10,7 +10,7 @@ def banner() -> None:
     """
     The banner for the system.
     """
-    print(Fore.CYAN + f"""
+    print(f"""{Fore.CYAN}
        ___             _   __          ____ 
       / _ \___ ____ __| | / /__ ___ __/ / /_
      / ___/ _ `(_-<(_-< |/ / _ `/ // / / __/
@@ -18,5 +18,7 @@ def banner() -> None:
                                             
     author: {__author__}
     version: {__version__}
-    GitHub: https://github.com/vlHan/PassVault\n""" + Style.RESET_ALL)
+    GitHub: https://github.com/vlHan/PassVault
+    
+    {Fore.MAGENTA}*Enter 'exit' or 'CTRL + C' at any point to exit.*\n{Style.RESET_ALL}""")
 

@@ -42,8 +42,7 @@ To authenticate the user, they are prompted to create a master password (that is
 
 ```py
 if os.path.isfile('vault.db'): # verify if the database exist
-    with sqlite3.connect('vault.db') as db: # connect with the database
-        cursor = db.cursor()
+    cursor = sqlite3.connect('vault.db').cursor() # connect with the database
     cursor.execute("SELECT * FROM masterpassword") # select the stored data 
     
     for row in cursor.fetchall(): 
@@ -62,7 +61,7 @@ if os.path.isfile('vault.db'): # verify if the database exist
 The encryption method used in this program comes from the python library [PyCryptoDome](https://pypi.org/project/pycryptodome/). This program uses AES encryption methods to store sensitive data (in this case passwords) into a SQLite database.
 
 ### SQLite Functions
-The SQLite database is used to store sensitive data, as mentioned above, this type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is localy lost, you only need the password manager to be able to decrypt the passwords stored in your backup database.
+The SQLite database is used to store sensitive data, as mentioned above. This type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is localy lost, you only need the password manager to be able to decrypt the passwords stored in your backup database.
 
 ## Example
 <img src="./demo/demo.gif" height="50%" width="100%"><br>
