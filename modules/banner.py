@@ -3,7 +3,7 @@
 from colorama import Fore, Style
 
 __author__ = "vlHan"
-__version__ = "V1.1"
+__version__ = "V1.2"
 
 
 def banner() -> None:
@@ -20,5 +20,4 @@ def banner() -> None:
     version: {__version__}
     GitHub: https://github.com/vlHan/PassVault
     
-    {Fore.MAGENTA}*Enter 'exit' or 'CTRL + C' at any point to exit.*\n{Style.RESET_ALL}""")
-
+    {Fore.MAGENTA}*Enter 'exit' or 'Ctrl + C' at any point to exit.*\n{Style.RESET_ALL}""")
