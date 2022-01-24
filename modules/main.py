@@ -10,6 +10,7 @@ from time import sleep
 import random, string, os
 from sys import exit
 
+
 class Manager:
     def __init__(self) -> None:
         self.master_pw = None
@@ -17,9 +18,12 @@ class Manager:
     def main(self) -> None:
         """Main function to verify the user
         """
-        if os.path.isfile('vault.db'):
+        if not os.path.isfile('vault.db'):
+            sqlite3.connect('vault.db')
+        try:
             cursor = sqlite3.connect('vault.db').cursor()
             cursor.execute("SELECT * FROM masterpassword")
+            
             for inf in cursor.fetchall():
                 master = inf[0]
                 salt = inf[1] 
@@ -35,26 +39,26 @@ class Manager:
             else:
                 print(f'{Fore.RED}The master password is not correct{Style.RESET_ALL}')
                 self.main()
-        
-        else: 
+    
+        except sqlite3.Error: 
             with sqlite3.connect('vault.db') as db: 
                 cursor = db.cursor()
             print(f'{Fore.GREEN}To start, you have to create a master password. Be careful not to lose it as it is unrecoverable{Style.RESET_ALL}')
             try:
-                master_pw = getpass.getpass('Create a master password to use the program: ')
-                verify_master = getpass.getpass('Enter your master password again to verify it: ')
+                master_pw = getpass.getpass(f'{Fore.CYAN}[PassVault]{Style.RESET_ALL} Create a master password to use the program: ')
+                verify_master = getpass.getpass(f'{Fore.CYAN}[PassVault]{Style.RESET_ALL} Enter your master password again to verify it: ')
             except KeyboardInterrupt:
-                os.remove('vault.db')
+                exit(0)
                 
             if master_pw == verify_master:
                 if master_pw.isnumeric() or master_pw.isspace():
                     print(f'{Fore.RED}\nThe password is not correct. Please try again{Style.RESET_ALL}')
-                    os.remove('vault.db')
+                    db.close()
                     return self.main()
 
                 elif len(master_pw) < 8:
                     print(f'{Fore.RED}\nThe password must have at least 8 caracters.{Style.RESET_ALL}')
-                    os.remove('vault.db')
+                    db.close()
                     return self.main()
 
                 else:
@@ -70,5 +74,5 @@ class Manager:
             
             else:
                 print(f'{Fore.RED }\nPassword do not match. Please try again.{Style.RESET_ALL}')
-                os.remove('vault.db')
+                db.close()
                 return self.main()
