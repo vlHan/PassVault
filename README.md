@@ -41,20 +41,26 @@ When running, the program will ask to create a master password. This master pass
 To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function as the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
 
 ```py
-if os.path.isfile('vault.db'): # verify if the database exist
+try: # try to connect
     cursor = sqlite3.connect('vault.db').cursor() # connect with the database
-    cursor.execute("SELECT * FROM masterpassword") # select the stored data 
-    
-    for row in cursor.fetchall(): 
-        master = row[0] 
-        salt = row[1] 
-    
-    self.master_pw = getpass.getpass('Enter your master password: ') # ask the master password
+    cursor.execute("SELECT * FROM masterpassword") # select the table
+
+    for inf in cursor.fetchall():
+        master = inf[0] 
+        salt = inf[1] 
+
+    self.master_pw = getpass.getpass(f'{Fore.CYAN}[PassVault]{Style.RESET_ALL} Enter your master password: ').strip() # ask the master password
     h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function
 
-    # compare the hashes
+    # compare the two hashes
     if h == master:
-      # rest of the program
+        # the master password is correct
+
+    else:
+        # the master password is not correct
+
+except sqlite3.Error: # if the connection does not work
+    # rest of the program
 ```
 
 ### AES Encryption
@@ -63,7 +69,7 @@ The encryption method used in this program comes from the python library [PyCryp
 ### SQLite Functions
 The SQLite database is used to store sensitive data, as mentioned above. This type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is localy lost, you only need the password manager to be able to decrypt the passwords stored in your backup database.
 
-## Example
+## Demo
 <img src="./demo/demo.gif" height="50%" width="100%"><br>
 
 ## Contributing
