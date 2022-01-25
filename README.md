@@ -3,6 +3,7 @@
 <p>
    <img alt="Languages" src="https://img.shields.io/badge/Python->=3.0-blue.svg"> 
    <img alt="Repository size" src="https://img.shields.io/github/repo-size/vlHan/PassVault">
+   <img alt="License" src="https://img.shields.io/badge/Build-Passing-green">
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
 
@@ -72,11 +73,17 @@ The SQLite database is used to store sensitive data, as mentioned above. This ty
 ## Demo
 <img src="./demo/demo.gif" height="50%" width="100%"><br>
 
-## Contributing
-To contribute see [guidelines for contributing](CONTRIBUTING.md).
+## Built With
+* [Python](https://www.python.org) - The language used
 
-### Shoutouts
-- <a href="https://github.com/carvalinh0/">carvalinh0</a> for helping me in the AES encryption.
+## Contributing
+Please read [CONTRIBUTING.md](https://github.com/vlHan/PassVault/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Authors
+- **vlHan** - *Initial work* - [vlHan](https://github.com/vlHan)
+- **Carvalinho** - *helped me in the AES encryption* - [carvalinh0](https://github.com/carvalinh0)
+
+See also the list of [contributors](https://github.com/vlHan/PassVault/contributors) who participated in this project.
 
 ## License 
-This project is under the [MIT License](LICENSE).
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/vlHan/PassVault/blob/master/LICENSE) file for details
