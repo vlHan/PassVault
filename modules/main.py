@@ -75,6 +75,6 @@ class Manager:
                     exit(1)
             
             else:
-                print('\n[red]Password do not match. Please try again.[/red]')
+                print('\n[red]Password does not match. Please try again.[/red]')
                 db.close()
                 return self.main()
