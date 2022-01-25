@@ -77,7 +77,7 @@ The SQLite database is used to store sensitive data, as mentioned above. This ty
 * [Python](https://www.python.org) - The language used
 
 ## Contributing
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct.
 
 ## Authors
 - **vlHan** - *Initial work* - [vlHan](https://github.com/vlHan)
