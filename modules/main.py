@@ -10,7 +10,6 @@ from time import sleep
 import random, string, os
 from sys import exit
 
-
 class Manager:
     def __init__(self) -> None:
         self.master_pw = None
@@ -27,8 +26,8 @@ class Manager:
             for inf in cursor.fetchall():
                 master = inf[0]
                 salt = inf[1] 
-
-            self.master_pw = getpass.getpass(f'{Fore.CYAN}[PassVault]{Style.RESET_ALL} Enter your master password: ').strip()
+            print("[cyan][PassVault][/cyan] Enter the master password:", end = ' ')
+            self.master_pw = getpass.getpass("").strip()
             h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
             
             if h == master:
@@ -37,27 +36,29 @@ class Manager:
                     sleep(1)
 
             else:
-                print(f'{Fore.RED}The master password is not correct{Style.RESET_ALL}')
+                print('[red]The master password is not correct[/red]')
                 self.main()
     
         except sqlite3.Error: 
             with sqlite3.connect('vault.db') as db: 
                 cursor = db.cursor()
-            print(f'{Fore.GREEN}To start, you have to create a master password. Be careful not to lose it as it is unrecoverable{Style.RESET_ALL}')
+            print('[green]To start, you have to create a master password. Be careful not to lose it as it is unrecoverable[/green]')
             try:
-                master_pw = getpass.getpass(f'{Fore.CYAN}[PassVault]{Style.RESET_ALL} Create a master password to use the program: ')
-                verify_master = getpass.getpass(f'{Fore.CYAN}[PassVault]{Style.RESET_ALL} Enter your master password again to verify it: ')
+                print('[cyan][PassVault][/cyan] Create a master password to use the program:', end=' ')
+                self.master_pw = getpass.getpass("")
+                print('[cyan][PassVault][/cyan] Enter your master password again to verify it:', end=' ')
+                verify_master = getpass.getpass("")
             except KeyboardInterrupt:
                 exit(0)
                 
-            if master_pw == verify_master:
-                if master_pw.isnumeric() or master_pw.isspace():
-                    print(f'{Fore.RED}\nThe password is not correct. Please try again{Style.RESET_ALL}')
+            if self.master_pw == verify_master:
+                if self.master_pw.isnumeric() or self.master_pw.isspace():
+                    print('\n[red]The password is not correct. Please try again[/red]')
                     db.close()
                     return self.main()
 
-                elif len(master_pw) < 8:
-                    print(f'{Fore.RED}\nThe password must have at least 8 caracters.{Style.RESET_ALL}')
+                elif len(self.master_pw) < 8:
+                    print('\n[red]The password must have at least 8 caracters.[/red]')
                     db.close()
                     return self.main()
 
@@ -65,14 +66,15 @@ class Manager:
                     cursor.execute("CREATE TABLE IF NOT EXISTS masterpassword (password TEXT NOT NULL, salt TEXT NOT NULL);")
 
                     salt = "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(32))
-                    master = hmac.new(master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
+                    master = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
                     
                     cursor.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
                     db.commit()
                     
-                    exit(f"{Fore.GREEN}\nThank you! Restart the program and enter your master password to begin.{Style.RESET_ALL}")
+                    print("\n[green]Thank you! Restart the program and enter your master password to begin.[/green]")
+                    exit(1)
             
             else:
-                print(f'{Fore.RED }\nPassword do not match. Please try again.{Style.RESET_ALL}')
+                print('\n[red]Password do not match. Please try again.[/red]')
                 db.close()
                 return self.main()

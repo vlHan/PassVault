@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from colorama import Fore, Style
+from rich import print
+from rich.text import Text
 
 __author__ = "vlHan"
 __version__ = "V1.2"
-
+__license__ = "MIT"
 
 def banner() -> None:
     """
     The banner for the system.
     """
-    print(f"""{Fore.CYAN}
+    print(f"""[cyan]
        ___             _   __          ____ 
       / _ \___ ____ __| | / /__ ___ __/ / /_
      / ___/ _ `(_-<(_-< |/ / _ `/ // / / __/
@@ -20,4 +21,4 @@ def banner() -> None:
     version: {__version__}
     GitHub: https://github.com/vlHan/PassVault
     
-    {Fore.MAGENTA}*Enter 'exit' or 'Ctrl + C' at any point to exit.*\n{Style.RESET_ALL}""")
+    [/cyan][magenta]*Enter 'exit' or 'Ctrl + C' at any point to exit.*[/magenta]\n""")

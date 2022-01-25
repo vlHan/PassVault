@@ -57,7 +57,7 @@ class DataBase:
             [str] initial value and the cyphertext in base64 (concatenate string)
         """
         if not pssw:
-            print(Fore.RED + 'The input cannot be empty. Please try again.' + Style.RESET_ALL)
+            print('[red]The input cannot be empty. Please try again.[/red]')
             return 
 
         pssw = pssw.encode('utf-8')
@@ -125,7 +125,7 @@ class DataBase:
         self.cursor.execute(f"""INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')""")
         self.datab.commit()
 
-        print(f"{Fore.GREEN}\n{self.checkmark_} Thank you! Datas were successfully added.{Style.RESET_ALL}")
+        print(f"[green]\n{self.checkmark_} Thank you! Datas were successfully added.[/green]")
 
     def edit_password(self) -> None:
         """
@@ -142,7 +142,7 @@ class DataBase:
         self.cursor.execute("SELECT COUNT(*) from passwords;")
         if self.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
-            print(f"{Fore.RED}{self.xmark_} The database is empty. Try adding a password.{Style.RESET_ALL}")
+            print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
             try:
@@ -153,7 +153,7 @@ class DataBase:
 
             if option == "url":
                 if not new.startswith("http"):
-                    print(f"{Fore.RED}{self.xmark_}\n The URL must contain http:// or https:// in the beginning.\n{Style.RESET_ALL}")
+                    print(f"[red]{self.xmark_}\n The URL must contain http:// or https:// in the beginning.[/red]\n")
                     sleep(1)
                     return self.edit_password()
 
@@ -165,7 +165,7 @@ class DataBase:
                     except requests.ConnectionError:
                         # If the connection does not work, the URL is incorrect.
                         # Then the question will return
-                        print(f"{Fore.RED}\n{self.xmark_} Invalid URL. Please try again.\n{Fore.RED}")
+                        print(f"[red]\n{self.xmark_} Invalid URL. Please try again.\n[/red]")
                         sleep(1)
                         return self.edit_password()
 
@@ -178,7 +178,7 @@ class DataBase:
             self.cursor.execute(f"""UPDATE passwords SET {option} = '{ct_new_info}' WHERE id = '{id}'""")
             self.datab.commit()
 
-            print(f"{Fore.GREEN}{self.checkmark_} The {option} has successfully changed to {new}.{Style.RESET_ALL}")
+            print(f"[red]{self.checkmark_} The {option} has successfully changed to {new}.[/red]")
 
     def look_up(self) -> None:
         """
@@ -191,7 +191,7 @@ class DataBase:
         self.cursor.execute("SELECT COUNT(*) from passwords;")
         if self.cursor.fetchall()[0][0] == 0:
             # verify if the database is empty - cannot opperate in a empty database
-            print(f"{Fore.RED}{self.xmark_} The database is empty. Try adding a password.{Style.RESET_ALL}")
+            print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
             try: 
@@ -215,7 +215,7 @@ class DataBase:
                 ]
                 
                 infos.clear()
-                print(f"\n{Fore.YELLOW}[ID: {row[0]}] {decrypted[0].decode()}\n{Fore.GREEN}Email: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n{Style.RESET_ALL}")
+                print(f"\n[yellow][ID: {row[0]}] {decrypted[0].decode()}[/yellow]\n[green]Email: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n[/green]")
 
     def stored_passwords(self) -> None: 
         """Stored passwords
@@ -226,7 +226,7 @@ class DataBase:
             pass
 
         if self.cursor.fetchall()[0][0] != 0:
-            print(f'{Fore.YELLOW}Current passwords stored:{Style.RESET_ALL}')
+            print('[yellow]Current passwords stored:[/yellow]')
 
             infos = []
             for row in self.cursor.execute("SELECT * FROM passwords;"):
@@ -243,7 +243,7 @@ class DataBase:
                 ]
                 
                 infos.clear()
-                print(f"{Fore.YELLOW}[ID: {row[0]}] Platform: {decrypted[0].decode()}{Style.RESET_ALL}")
+                print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0].decode()}[/yellow]")
 
     def delete_one(self) -> None:
         """Delete one password
@@ -252,7 +252,7 @@ class DataBase:
             delete_pwd = str(input("Delete normal password or master password? (normal/master) ").lower().strip())
 
             if delete_pwd == "exit":
-                exit(f"{Fore.CYAN}Thanks for using.{Style.RESET_ALL}")
+                exit("[cyan]Thanks for using.[/cyan]")
 
             elif delete_pwd == "":
                 return self.delete_one()
@@ -261,30 +261,31 @@ class DataBase:
                 self.cursor.execute("SELECT COUNT(*) from passwords;")
                 if self.cursor.fetchall()[0][0] == 0: 
                     # verify if the database is empty - cannot opperate in a empty database
-                    print(f"{Fore.RED}{self.xmark_} The database is empty. Try adding a password.{Style.RESET_ALL}")
+                    print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
                 else:
                     id = str(input("Enter the ID of the password which you want delete: ")).strip()
                     self.cursor.execute(f"DELETE from passwords WHERE id = '{id}'")
                     self.datab.commit()
                     
-                    print(f"{Fore.GREEN}\n{self.checkmark_} The password was successfully deleted.\n{Style.RESET_ALL}")
+                    print(f"[green]\n{self.checkmark_} The password was successfully deleted.\n[/green]")
 
             elif delete_pwd == "master":
-                print(f'{Fore.RED}NOTE: If you delete the master password you will lost all your sensitives data and will be logged out{Style.RESET_ALL}')
+                print('[red]NOTE: If you delete the master password you will lost all your sensitives data and will be logged out[/red]')
                 confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
 
                 if confirm == "y":
-                    print(f"{Fore.RED}Deleting all the passwords...{Style.RESET_ALL}")
+                    print("[red]Deleting all the passwords...[/red]")
                     sleep(1)
                     self.cursor.execute("DROP TABLE passwords;")
                     self.cursor.execute("DROP TABLE masterpassword;")
                     self.datab.commit()
                     self.datab.close()
                     sleep(1)
-                    print(f"{Fore.GREEN}{self.checkmark_} Done! All passwods and the master password were successfully deleted.{Style.RESET_ALL}")
-                    print(f'{Fore.RED}Logging out...{Style.RESET_ALL}')
-                    exit(f'{Fore.CYAN }Thanks for using.{Style.RESET_ALL}')
+                    print(f"[green]{self.checkmark_} Done! All passwods and the master password were successfully deleted.[/green]")
+                    print('[red]Logging out...[/red]')
+                    print('[cyan]Thanks for using.[/cyan]')
+                    exit(1)
                 
                 elif confirm != "n": 
                     return self.delete_one()
@@ -302,13 +303,13 @@ class DataBase:
         self.cursor.execute("SELECT COUNT(*) from passwords;")
         if self.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
-            print(f"{Fore.RED}{self.xmark_} The database is empty. Try adding a password.{Style.RESET_ALL}")
+            print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
             try:
                 confirm = str(input("Are you sure you want to delete all normal passwords? (Y/n) ")).strip().lower()
                 if confirm == "y":
-                    print(f"{Fore.RED}Deleting all data... (database){Style.RESET_ALL}")
+                    print("[red]Deleting all data... (database)[/red]")
                     print("Removing...")
                     sleep(2)
 
@@ -317,19 +318,20 @@ class DataBase:
                     self.datab.commit()
 
                     sleep(1)
-                    print(f"{Fore.GREEN}{self.checkmark_} Done. All the passwords stored had been deleted with success.{Style.RESET_ALL}")
+                    print(f"[green]{self.checkmark_} Done. All the passwords stored had been deleted with success.[/green]")
 
                 elif confirm == "n":
                     pass
 
                 elif confirm == "exit":
-                    exit(f"{Fore.CYAN}Thanks for using.{Style.RESET_ALL}")
+                    print("[cyan]Thanks for using.[/cyan]")
+                    exit(1)
 
                 elif confirm == "":
                     return self.delete_all()
 
                 else:
-                    print(f"{Fore.RED}{self.xmark_} Invalid answer.{Style.RESET_ALLs}")
+                    print(f"[red]{self.xmark_} Invalid answer.[/red]")
                     return self.delete_all()
             
             except KeyboardInterrupt: 

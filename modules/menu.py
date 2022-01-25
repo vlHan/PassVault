@@ -37,14 +37,14 @@ class Menu:
             self.platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
             if self.platform.isnumeric() or self.platform.isspace():
-                print(f"{Fore.RED}{self.db.xmark_}Enter a valid answer{Style.RESET_ALL}")
+                print(f"[red]{self.db.xmark_}Enter a valid answer[/red]")
                 return self.__begin_informations()
 
             self.mail = str(input("Enter the email for this account: ")).lower().strip()
             self.url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
 
             if not self.url.startswith("http"):
-                print(f"{Fore.RED}{self.db.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.{Style.RESET_ALL}")
+                print(f"[red]{self.db.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.[/red]")
                 sleep(1)
 
                 return self.__begin_informations()
@@ -57,7 +57,7 @@ class Menu:
                 except requests.ConnectionError:
                     # If the connection does not work, the URL is incorrect.
                     # Then the question will return
-                    print(f"{Fore.RED}{self.db.xmark_} Invalid URL.{Style.RESET_ALL}")
+                    print(f"[red]{self.db.xmark_} Invalid URL.[/red]")
                     sleep(1)
 
                     return self.__begin_informations()
@@ -65,7 +65,7 @@ class Menu:
             want_gen = str(input(f"Do you want to generate a password for {self.platform}? (Y/n): ")).lower().strip()
             # Generate a password for a platform.
             if want_gen == "exit":
-                exit(f"{Fore.CYAN}Thanks for using.{Style.RESET_ALL}")
+                exit("[cyan]Thanks for using.[/cyan]")
 
             elif want_gen == "y":
                 try: 
@@ -77,7 +77,7 @@ class Menu:
                 return getpass.getpass(prompt=f"Enter the password which you want to add for {self.platform} in the database: ").strip()
 
             else:
-                print(f"{Fore.RED}Enter a valid answer.{Style.RESET_ALL}")
+                print("[red]Enter a valid answer.[/red]")
                 return self.__begin_informations()
 
         except KeyboardInterrupt:
@@ -92,12 +92,12 @@ class Menu:
             KeyboardInterrupt -- user interrupt the program
         """
         banner()
-        print(f"{Fore.BLUE} 1) Add a password{Style.RESET_ALL}")
-        print(f"{Fore.BLUE} 2) Update informations{Style.RESET_ALL}")
-        print(f"{Fore.BLUE} 3) Look up passwords{Style.RESET_ALL}")
-        print(f"{Fore.RED} 4) Delete a password (normal/master){Style.RESET_ALL}")
-        print(f"{Fore.RED} 5) Delete all normal passwords{Style.RESET_ALL}")
-        print(f"{Fore.RED} 6) Exit the program{Style.RESET_ALL}")
+        print("[blue] 1) Add a password[/blue]")
+        print("[blue] 2) Update informations[/blue]")
+        print("[blue] 3) Look up passwords[/blue]")
+        print("[red] 4) Delete a password (normal/master)[/red]")
+        print("[red] 5) Delete all normal passwords[/red]")
+        print("[red] 6) Exit the program[/red]")
 
         try:
             choice = str(input("\n └──Enter a choice: ")).strip()
@@ -106,10 +106,11 @@ class Menu:
 
         if choice in ["6", "exit"]:
             # Exit
-            exit(f"{Fore.CYAN}Thanks for using.{Style.RESET_ALL}")
+            print("[cyan]Thanks for using.[/cyan]")
+            exit(1)
         
         elif choice not in ["1", "2", "3", "4", "5", "6", "exit"]:
-            print(f'{Fore.RED}{self.db.xmark_} Invalid option.{Style.RESET_ALL}')
+            print(f'[red]{self.db.xmark_} Invalid option.[/red]')
             sleep(1)
             return self.menu_interface()
 
@@ -147,12 +148,12 @@ class Menu:
             pwd_len = int(input("What length would you like your password to be? (At least 8) "))
 
             if pwd_len < 8:
-                print(f"\n{Fore.RED}{self.db.xmark_} The password is not long enough. Please try again.{Style.RESET_ALL}\n")
+                print(f"\n[red]{self.db.xmark_} The password is not long enough. Please try again.[/red]\n")
                 return self.__generate_pass()
             else:
                 print()
                 for _ in range(1):
-                    print(f'{Fore.YELLOW}Password for {self.platform}:', end=' ' + f'{Style.RESET_ALL}')
+                    print(f'[yellow]Password for {self.platform}:[/yellow]', end=' ')
                     generated_password = ''.join(random.choice(string.ascii_uppercase + string.digits +
                                                 string.ascii_lowercase + string.punctuation) for _ in range(pwd_len))
                     print(generated_password)
@@ -166,7 +167,7 @@ class Menu:
                     return self.__begin_informations()
 
                 else:
-                    print(f"{Fore.RED}{self.db.xmark_} Enter a valid answer.{Style.RESET_ALL}")
+                    print(f"[red]{self.db.xmark_} Enter a valid answer.[/red]")
                     return self.__generate_pass()
         
         except KeyboardInterrupt: 
