@@ -41,19 +41,19 @@ When running, the program will ask to create a master password. This master pass
 To authenticate the user, they are prompted to create a master password (that is also used to decrypt data) which is then stored using HMAC autentication code (that use SHA3_512 Hash Function as the digest mod). Whenever the user is prompted to verify their master password, the password they enter is compared to the hash of the stored master password and access if granted if the two hashes match.
 
 ```py
-try: # try to connect
-    cursor = sqlite3.connect('vault.db').cursor() # connect with the database
-    cursor.execute("SELECT * FROM masterpassword") # select the table
+try:
+    cursor = sqlite3.connect('vault.db').cursor()
+    cursor.execute("SELECT * FROM masterpassword")
+    
+    for row in cursor.fetchall():
+        stored_master = row[0]
+        salt = row[1] 
 
-    for inf in cursor.fetchall():
-        master = inf[0] 
-        salt = inf[1] 
-
-    self.master_pw = getpass.getpass(f'{Fore.CYAN}[PassVault]{Style.RESET_ALL} Enter your master password: ').strip() # ask the master password
-    h = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() # use HMAC and encrypt in sha3_512 HASH Function
-
+    print("[cyan][PassVault][/cyan] Enter the master password:", end = ' ')
+    self.master_pw = getpass.getpass("").strip() # ask the master password
+    
     # compare the two hashes
-    if h == master:
+    if hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() == stored_master:
         # the master password is correct
 
     else:

@@ -2,10 +2,10 @@
 from modules import *
 
 import sqlite3
-import requests
+import random
+import string
 
 from time import sleep
-from sys import exit
 
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
@@ -21,11 +21,9 @@ class DataBase:
     it at https://github.com/vlHan/PassVault/issues
     """
 
-    def __init__(self, master_pssw: str) -> None:
+    def __init__(self) -> None:
         self.datab = sqlite3.connect("vault.db")
         self.cursor = self.datab.cursor()
-        self.checkmark_ = '\u2713'
-        self.xmark_ = '\u2717'
         # Connect with the SQlite and create the table.
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS passwords (
@@ -42,8 +40,9 @@ class DataBase:
             self.salt = row[1] 
         # Putting together the master password with the salt 
         # to use in the verificantion and in the encryption and decryption 
-        self.master_pssw = master_pssw + self.salt
-
+        self.specialchars = "_!@#$%&*()-"
+        self.xmark_ = '\u2717'
+        self.checkmark_ = '\u2713'
 
     def encryption(self, pssw: str, key: str) -> tuple:
         """
@@ -56,9 +55,6 @@ class DataBase:
         Return 
             [str] initial value and the cyphertext in base64 (concatenate string)
         """
-        if not pssw:
-            print('[red]The input cannot be empty. Please try again.[/red]')
-            return 
 
         pssw = pssw.encode('utf-8')
         key = key.encode('utf-8')
@@ -89,8 +85,31 @@ class DataBase:
         cipher = AES.new(key, AES.MODE_CBC, initial_value)
 
         return unpad(cipher.decrypt(concatenate), AES.block_size) # try decrypt the cypher text
+    
+    def generate_password(self) -> None:
+        """Returns generated password
 
-    def save_password(self, platform: str, mail: str, password: str, url: str) -> None:
+        Returns
+            [str] -- A random password
+        """
+        pwd_len = int(input("What length would you like your password to be? (At least 8) "))
+
+        if pwd_len < 8:
+            print("\n[red] The password is not long enough. Please try again.[/red]\n")
+            return self.generate_password()
+        else:
+            # Generating a password
+            password = [random.choice(random.choice([
+                string.ascii_lowercase,
+                string.ascii_uppercase,
+                string.digits,
+                self.specialchars
+            ])) for _ in range(pwd_len)]
+
+            print('\n[yellow]Generated password:[/yellow]', ''.join(password))
+            return ''.join(password)
+
+    def save_password(self, platform: str, mail: str, password: str, url: str, master_pssw: str) -> None:
         """
         Add values in the Database SQlite.
 
@@ -99,6 +118,9 @@ class DataBase:
             mail [str] -- email of the account
             password [str] -- password of the account to save in the database
             url [str] -- URL of the platform
+        
+        Returns 
+            [tuple] -- Sensitives datas saved in the SQLite.
         """
         self.cursor.execute("SELECT id FROM passwords;")
         # The ID must be the length of the datas stored in the database plus one
@@ -116,9 +138,9 @@ class DataBase:
 
         infos = []
         stored_infos = [platform, mail, password, url]
-
+        master_pss = master_pssw + self.salt
         for i in stored_infos:
-            initial_value, contatenate = self.encryption(i, self.master_pssw[:32])
+            initial_value, contatenate = self.encryption(i, master_pss[:32])
             concatenate = initial_value + "|" + contatenate
             infos.append(concatenate)
         # Insert each value in the table passwords
@@ -127,11 +149,12 @@ class DataBase:
 
         print(f"[green]\n{self.checkmark_} Thank you! Datas were successfully added.[/green]")
 
-    def edit_password(self) -> None:
+    def edit_password(self, master_pssw: str, new: str, option: str, id_opt: str ) -> None:
         """
         Update values in the database SQlite.
 
         Arguments: 
+            master_pssw [str] -- master password
             option [str] -- what need to be changed
             new [str] -- the new password
             id [str] -- the id of the data
@@ -145,44 +168,27 @@ class DataBase:
             print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
-            try:
-                option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
-                new = str(input(f"\nEnter the new {option} which you want add in the database: ")).strip()
-            except KeyboardInterrupt: 
-                exit(0)
-
-            if option == "url":
-                if not new.startswith("http"):
-                    print(f"[red]{self.xmark_}\n The URL must contain http:// or https:// in the beginning.[/red]\n")
-                    sleep(1)
-                    return self.edit_password()
-
-                elif new.startswith("http"):
-                    try:
-                        # Make a request in the URL gaved.
-                        requests.get(new)
-
-                    except requests.ConnectionError:
-                        # If the connection does not work, the URL is incorrect.
-                        # Then the question will return
-                        print(f"[red]\n{self.xmark_} Invalid URL. Please try again.\n[/red]")
-                        sleep(1)
-                        return self.edit_password()
-
-            id = str(
-                input(f"\nEnter the ID from the {option}: "))
+            try: 
+                self.cursor.execute(f"SELECT from passwords WHERE id = '{id_opt}'")
+            except sqlite3.Error: 
+                return print(f"[red]{self.xmark_} The ID is not correct[/red]") 
+            else: 
+                master_pss = master_pssw + self.salt
+                initial_value, concatenate = self.encryption(new, master_pss[:32])
+                ct_new_info = initial_value + "|" + concatenate
                 
-            initial_value, concatenate = self.encryption(new, self.master_pssw[:32])
-            ct_new_info = initial_value + "|" + concatenate
-            
-            self.cursor.execute(f"""UPDATE passwords SET {option} = '{ct_new_info}' WHERE id = '{id}'""")
-            self.datab.commit()
+                self.cursor.execute(f"""UPDATE passwords SET {option} = '{ct_new_info}' WHERE id = '{id_opt}'""")
+                self.datab.commit()
 
-            print(f"[red]{self.checkmark_} The {option} has successfully changed to {new}.[/red]")
+                print(f"[red]{self.checkmark_} The {option} has successfully changed to {new}.[/red]")
 
-    def look_up(self) -> None:
+    def look_up(self, master_pssw: str, id_opt: str) -> None:
         """
         See all passwords stored in the database.
+
+        Arguments 
+            master_pssw [str] -- the master password
+            id_opt [str] -- the ID chosed
 
         Returns
             [tuple] The passwords stored
@@ -195,29 +201,31 @@ class DataBase:
 
         else:
             try: 
-                id = str(input('Enter ID for the password you want to retrieve: ')).strip()
-            except KeyboardInterrupt: 
-                raise KeyboardInterrupt
-            infos = []
-            for row in self.cursor.execute(f"SELECT * FROM passwords WHERE id = '{id}';"):
-                infos.append(row[1])
-                infos.append(row[2])
-                infos.append(row[3])
-                infos.append(row[4])
+                self.cursor.execute(f"SELECT from passwords WHERE id = '{id_opt}'")
+            except sqlite3.Error: 
+                return print(f"[red]{self.xmark_} The ID is not correct[/red]")
+            else: 
+                master_pss = master_pssw + self.salt
+                infos = []
+                for row in self.cursor.execute(f"SELECT * FROM passwords WHERE id = '{id}';"):
+                    infos.append(row[1])
+                    infos.append(row[2])
+                    infos.append(row[3])
+                    infos.append(row[4])
 
-                decrypted = [
-                    self.decryption(
-                        str(i).split("|")[0], 
-                        str(i).split("|")[1],
-                        self.master_pssw[:32]
-                    )
-                    for i in infos
-                ]
-                
-                infos.clear()
-                print(f"\n[yellow][ID: {row[0]}] {decrypted[0].decode()}[/yellow]\n[green]Email: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n[/green]")
+                    decrypted = [
+                        self.decryption(
+                            str(i).split("|")[0], 
+                            str(i).split("|")[1],
+                            master_pss[:32]
+                        )
+                        for i in infos
+                    ]
+                    
+                    infos.clear()
+                    print(f"\n[yellow][ID: {row[0]}] {decrypted[0].decode()}[/yellow]\n[green]Email: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n[/green]")
 
-    def stored_passwords(self) -> None: 
+    def stored_passwords(self, master_pssw: str) -> None: 
         """Stored passwords
         """
         try:
@@ -225,72 +233,63 @@ class DataBase:
         except sqlite3.OperationalError: 
             pass
 
-        if self.cursor.fetchall()[0][0] != 0:
-            print('[yellow]Current passwords stored:[/yellow]')
+        if self.cursor.fetchall()[0][0] == 0: 
+            # verify if the database is empty - cannot opperate in a empty database
+            raise PermissionError
 
-            infos = []
-            for row in self.cursor.execute("SELECT * FROM passwords;"):
-                infos.append(row[1])
-                infos.append(row[2])
+        print('[yellow]Current passwords stored:[/yellow]')
+        master_pss = master_pssw + self.salt
+        infos = []
+        for row in self.cursor.execute("SELECT * FROM passwords;"):
+            infos.append(row[1])
+            infos.append(row[2])
 
-                decrypted = [
-                    self.decryption(
-                        str(i).split("|")[0], 
-                        str(i).split("|")[1],
-                        self.master_pssw[:32]
-                    )
-                    for i in infos
-                ]
-                
-                infos.clear()
-                print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0].decode()}[/yellow]")
-
-    def delete_one(self) -> None:
+            decrypted = [
+                self.decryption(
+                    str(i).split("|")[0], 
+                    str(i).split("|")[1],
+                    master_pss[:32]
+                )
+                for i in infos
+            ]
+            
+            infos.clear()
+            print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0].decode()}[/yellow]\n")
+            
+    def delete_normal(self, id_opt: str) -> None:
         """Delete one password
+
+        Arguments 
+            id_opt [str] -- the ID chosed
         """
-        try:
-            delete_pwd = str(input("Delete normal password or master password? (normal/master) ").lower().strip())
+        self.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.cursor.fetchall()[0][0] == 0: 
+            # verify if the database is empty - cannot opperate in a empty database
+            print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
-            if delete_pwd == "exit":
-                exit("[cyan]Thanks for using.[/cyan]")
+        else:
+            try:
+                self.cursor.execute(f"SELECT from passwords WHRE id = '{id_opt}'")
+            except sqlite3.DatabaseError: 
+                print(f'[red]{self.xmark_} The ID is not correct.[/red]')
+            else:
+                self.cursor.execute(f"DELETE from passwords WHERE id = '{id_opt}'") 
+                self.datab.commit()
+                print(f"[green]\n{self.db.checkmark_} The password was successfully deleted.\n[/green]")
 
-            elif delete_pwd == "":
-                return self.delete_one()
+    def delete_master(self):
+        """
+        Delete master password all the data
+        """
+        self.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.cursor.fetchall()[0][0] == 0: 
+            # verify if the database is empty - cannot opperate in a empty database
+            print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
-            elif delete_pwd == "normal":
-                self.cursor.execute("SELECT COUNT(*) from passwords;")
-                if self.cursor.fetchall()[0][0] == 0: 
-                    # verify if the database is empty - cannot opperate in a empty database
-                    print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
-
-                else:
-                    id = str(input("Enter the ID of the password which you want delete: ")).strip()
-                    self.cursor.execute(f"DELETE from passwords WHERE id = '{id}'")
-                    self.datab.commit()
-                    
-                    print(f"[green]\n{self.checkmark_} The password was successfully deleted.\n[/green]")
-
-            elif delete_pwd == "master":
-                print('[red]NOTE: If you delete the master password you will lost all your sensitives data and will be logged out[/red]')
-                confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
-
-                if confirm == "y":
-                    print("[red]Deleting all the passwords...[/red]")
-                    sleep(1)
-                    self.cursor.execute("DROP TABLE passwords;")
-                    self.cursor.execute("DROP TABLE masterpassword;")
-                    self.datab.commit()
-                    self.datab.close()
-                    sleep(1)
-                    print(f"[green]{self.checkmark_} Done! All passwods and the master password were successfully deleted.[/green]")
-                    print('[red]Logging out...[/red]')
-                    print('[cyan]Thanks for using.[/cyan]')
-                    exit(1)
-                
-                elif confirm != "n": 
-                    return self.delete_one()
-        except KeyboardInterrupt: 
-            exit(0)
+        else:
+            self.cursor.execute("DROP TABLE passwords;")
+            self.cursor.execute("DROP TABLE masterpassword;")
+            self.datab.commit()
 
     def delete_all(self) -> None:
         """
@@ -306,33 +305,14 @@ class DataBase:
             print(f"[red]{self.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
-            try:
-                confirm = str(input("Are you sure you want to delete all normal passwords? (Y/n) ")).strip().lower()
-                if confirm == "y":
-                    print("[red]Deleting all data... (database)[/red]")
-                    print("Removing...")
-                    sleep(2)
+            print("[red]Deleting all data... (database)[/red]")
+            print("Removing...")
+            sleep(2)
 
-                    # Dropping the datable
-                    self.cursor.execute("DROP TABLE passwords;")
-                    self.datab.commit()
+            # Dropping the datable
+            self.cursor.execute("DROP TABLE passwords;")
+            self.datab.commit()
 
-                    sleep(1)
-                    print(f"[green]{self.checkmark_} Done. All the passwords stored had been deleted with success.[/green]")
-
-                elif confirm == "n":
-                    pass
-
-                elif confirm == "exit":
-                    print("[cyan]Thanks for using.[/cyan]")
-                    exit(1)
-
-                elif confirm == "":
-                    return self.delete_all()
-
-                else:
-                    print(f"[red]{self.xmark_} Invalid answer.[/red]")
-                    return self.delete_all()
-            
-            except KeyboardInterrupt: 
-                exit(0)
+            sleep(1)
+            print(f"[green]{self.checkmark_} Done. All the passwords stored had been deleted with success.[/green]")
+            exit('[red]Exiting...[/red]')

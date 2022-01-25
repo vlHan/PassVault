@@ -2,9 +2,8 @@
 from modules import *
 
 import requests
-import random
 import getpass
-import string
+
 from time import sleep
 from sys import exit
 
@@ -17,79 +16,71 @@ class Menu:
         master_pw [str] -- master password
     """
     def __init__(self, master_pw: str) -> None:
-        self.db = DataBase(master_pw)
-        self.platform = None
-        self.mail = None
-        self.password = None
-        self.url = None
+        self.master_pw = master_pw
+        self.db = DataBase()
 
-    def __begin_informations(self) -> str:
+    def begin_program(self) -> str:
         """
-        Required informations to begin the program
+        Beginning of the program
+
+        Raises: 
+            KeyboardInterrupt -- user interrupts
 
         Returns
             Informations to store in the database  
-
-        Raises 
-            ConnectionError -- request does not work 
         """
-        try: 
-            self.platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
+        choice = self.menu_interface()
+        if choice in ["6", "exit"]:
+            # Exit
+            print("[cyan]Thanks for using.[/cyan]")
+            exit(1)
 
-            if self.platform.isnumeric() or self.platform.isspace():
-                print(f"[red]{self.db.xmark_}Enter a valid answer[/red]")
-                return self.__begin_informations()
+        elif choice == "1":
+            # add password
+            try:
+                platform, mail, password, url = self.inform_data()
+                self.db.save_password(platform, mail, password, url, self.master_pw)
+            except KeyboardInterrupt: 
+                raise KeyboardInterrupt
 
-            self.mail = str(input("Enter the email for this account: ")).lower().strip()
-            self.url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
+        elif choice == "2":
+            # edit informations
+            try:
+                self.edit_password()
+            except KeyboardInterrupt: 
+                raise KeyboardInterrupt
 
-            if not self.url.startswith("http"):
-                print(f"[red]{self.db.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.[/red]")
-                sleep(1)
+        elif choice == "3":
+            # look up password
+            try:
+                self.look_up()
+            except KeyboardInterrupt: 
+                raise KeyboardInterrupt
 
-                return self.__begin_informations()
+        elif choice == "4":
+            # delete a password
+            try: 
+                self.delete_one()
+            except KeyboardInterrupt: 
+                raise KeyboardInterrupt
 
-            elif self.url.startswith("http"):
-                try:
-                    # Make a request in the URL gaved.
-                    requests.get(self.url)
-
-                except requests.ConnectionError:
-                    # If the connection does not work, the URL is incorrect.
-                    # Then the question will return
-                    print(f"[red]{self.db.xmark_} Invalid URL.[/red]")
-                    sleep(1)
-
-                    return self.__begin_informations()
-
-            want_gen = str(input(f"Do you want to generate a password for {self.platform}? (Y/n): ")).lower().strip()
-            # Generate a password for a platform.
-            if want_gen == "exit":
-                exit("[cyan]Thanks for using.[/cyan]")
-
-            elif want_gen == "y":
-                try: 
-                    return self.__generate_pass()
-                except KeyboardInterrupt: 
-                    exit(0)
-
-            elif want_gen == "n":
-                return getpass.getpass(prompt=f"Enter the password which you want to add for {self.platform} in the database: ").strip()
-
-            else:
-                print("[red]Enter a valid answer.[/red]")
-                return self.__begin_informations()
-
-        except KeyboardInterrupt:
-            exit(0)
+        elif choice == "5":
+            # delete all passwords
+            try:
+                self.delete_all()
+            except KeyboardInterrupt: 
+                raise KeyboardInterrupt
+        
+        else: 
+            print(f'[red]{self.db.xmark_} Invalid option.[/red]')
+            return self.begin_program()
 
     def menu_interface(self) -> None:
         """
         Menu interface
 
-        Raises 
-            ConnectionError -- request does not work
-            KeyboardInterrupt -- user interrupt the program
+        Raises: 
+            KeyboardInterrupt -- user interrupts
         """
         banner()
         print("[blue] 1) Add a password[/blue]")
@@ -100,75 +91,218 @@ class Menu:
         print("[red] 6) Exit the program[/red]")
 
         try:
-            choice = str(input("\n └──Enter a choice: ")).strip()
+            return str(input("\n └──Enter a choice: ")).strip()
         except KeyboardInterrupt: 
-            exit(0)
-
-        if choice in ["6", "exit"]:
-            # Exit
-            print("[cyan]Thanks for using.[/cyan]")
-            exit(1)
+            raise KeyboardInterrupt
+    
+    def inform_data(self) -> tuple:
+        """Inform the user datas 
         
-        elif choice not in ["1", "2", "3", "4", "5", "6", "exit"]:
-            print(f'[red]{self.db.xmark_} Invalid option.[/red]')
-            sleep(1)
-            return self.menu_interface()
-
-        self.db.stored_passwords()
-        print()
-        if choice == "1":
-            # add password
-            self.password = self.__begin_informations()
-            self.db.save_password(self.platform, self.mail, self.password, self.url)
-
-        elif choice == "2":
-            # update informations
-            self.db.edit_password()
-
-        elif choice == "3":
-            # look up password
-            self.db.look_up()
-
-        elif choice == "4":
-            # delete a password
-            self.db.delete_one()
-
-        elif choice == "5":
-            # delete all passwords
-            self.db.delete_all()
-            
-    def __generate_pass(self) -> None:
-        """Returns generated password
+        Raises: 
+            KeyboardInterrupt -- user interrupts
 
         Returns
-            [str] -- A random password
-
+            platform [str] -- user platform to stored
+            mail [str] -- email account
+            password [str] - account's password
+            url [str] - url of the platform
         """
-        try:
-            pwd_len = int(input("What length would you like your password to be? (At least 8) "))
+        try: 
+            platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
-            if pwd_len < 8:
-                print(f"\n[red]{self.db.xmark_} The password is not long enough. Please try again.[/red]\n")
-                return self.__generate_pass()
-            else:
-                print()
-                for _ in range(1):
-                    print(f'[yellow]Password for {self.platform}:[/yellow]', end=' ')
-                    generated_password = ''.join(random.choice(string.ascii_uppercase + string.digits +
-                                                string.ascii_lowercase + string.punctuation) for _ in range(pwd_len))
-                    print(generated_password)
-                enter_pw = str(
-                    input("Do you want to use this password? (Y/n) ")).lower().strip()
-                if enter_pw == 'y':
-                    return generated_password
+            if platform.isnumeric() or platform.isspace():
+                print(f"[red]{self.db.xmark_}Enter a valid answer[/red]")
+                return self.__begin_informations()
 
-                elif enter_pw == 'n': 
-                    print('\nReturning to the beginning...\n')
+            mail = str(input("Enter the email for this account: ")).lower().strip()
+            url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
+
+            if not url.startswith("http"):
+                print(f"[red]{self.db.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.[/red]")
+                sleep(1)
+
+                return self.__begin_informations()
+
+            elif url.startswith("http"):
+                try:
+                    # Make a request in the URL gaved.
+                    requests.get(url)
+
+                except requests.ConnectionError:
+                    # If the connection does not work, the URL is incorrect.
+                    # Then the question will return
+                    print(f"[red]{self.db.xmark_} Invalid URL.[/red]")
+                    sleep(1)
+
                     return self.__begin_informations()
 
-                else:
-                    print(f"[red]{self.db.xmark_} Enter a valid answer.[/red]")
-                    return self.__generate_pass()
+            want_gen = str(input(f"Do you want to generate a password for {platform}? (Y/n): ")).lower().strip()
+            # Generate a password for a platform.
+            if want_gen == "exit":
+                exit("[cyan]Thanks for using.[/cyan]")
+
+            elif want_gen == "y":
+                try:
+                    password = self.__return_generated()
+                except KeyboardInterrupt: 
+                    raise KeyboardInterrupt
+
+            elif want_gen == "n":
+                password = getpass.getpass(prompt=f"Enter the password which you want to add for {platform} in the database: ").strip()
+
+            else:
+                print("[red]Enter a valid answer.[/red]")
+                return self.__begin_informations()
+            
+            return (platform, mail, password, url)
+
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
+
+    def __return_generated(self) -> str: 
+        """Returns a generated password
         
+        Returns:
+            str -- A randomly generated password
+        """
+
+        generated_pass = self.db.generate_password()
+        loop = str(input("Generate a new password? (Y/N): ")).lower().strip()
+        if loop == "exit":
+            exit('Thanks for using.')
+        elif (loop == 'y') or (loop.strip() == ""):
+            return self.__return_generated() # recursive call
+        elif loop == 'n':
+            return generated_pass
+    
+    def edit_password(self) -> None:
+        """
+        Edit stored informations 
+        
+        Raises 
+            PermissionError -- No permission to use
+
+        Returns 
+            New SQLite system application.
+        """
+        try:
+            self.db.stored_passwords(self.master_pw)
+        except PermissionError: 
+            return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+        
+        option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
+        new = str(input(f"\nEnter the new {option} which you want add in the database: ")).strip()
+
+        if option not in ['platform', 'email', 'password', 'url']: 
+            return print(f'[red]{self.db.xmark_} Enter a valid answer.[/red]')
+        elif option == "" or new == "": 
+            return print(f'[red]{self.db.xmark_} Inputs could not be empty.[/red]')
+        elif option == "url":
+            if not new.startswith("http"):
+                print(f"[red]{self.db.xmark_}\n The URL must contain http:// or https:// in the beginning.[/red]\n")
+                sleep(1)
+                return self.edit_password()
+
+            elif new.startswith("http"):
+                try:
+                    # Make a HTTP request in the URL
+                    requests.get(new)
+                except requests.ConnectionError:
+                    # If the connection does not work, the URL is incorrect.
+                    # Then the question will return
+                    print(f"[red]\n{self.db.xmark_} Invalid URL. Please try again.\n[/red]")
+                    sleep(1)
+                    return self.edit_password()
+
+        id_opt = str(input(f"\nEnter the ID from the {option}: "))
+        self.db.edit_password(self.master_pw, new, option, id_opt)
+
+    def look_up(self) -> None:
+        """
+        Look up password
+
+        Raises 
+            PermissionError -- No permission to use
+            KeyboardInterrupt -- User Interrupts the program
+
+        Returns 
+            New SQLite system application.
+        """ 
+        try:
+            try:
+                self.db.stored_passwords(self.master_pw)
+            except PermissionError: 
+                return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+
+            id_opt = str(input('Enter ID for the password you want to retrieve: ')).strip()
+            self.db.look_up(self.master_pw, id_opt)
         except KeyboardInterrupt: 
-            exit(0)
+            raise KeyboardInterrupt
+
+    def delete_one(self) -> None:
+        """
+        Delete a password
+        
+        Raises 
+            PermissionError -- No permission to use
+            KeyboardInterrupt -- User Interrupts the program
+
+        Returns 
+            A password deleted
+        """
+        try:
+            self.db.stored_passwords(self.master_pw)
+        except PermissionError: 
+            return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+
+
+        try:
+            delete_pwd = str(input("Delete normal password or master password? (normal/master) ").lower().strip())
+
+            if delete_pwd == "exit":
+                exit("[cyan]Thanks for using.[/cyan]")
+            elif delete_pwd == "":
+                return self.delete_one()
+            elif delete_pwd == "normal":
+                id = str(input("Enter the ID of the password which you want delete: ")).strip()
+                return self.db.delete_normal(id)
+            elif delete_pwd == "master":
+                print('[bold red]NOTE: If you delete the master password you will lost all your sensitives data and will be logged out[/red]')
+                confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
+
+                if confirm == "y":
+                    return self.db.delete_master()
+                
+                elif confirm != "n": 
+                    return self.delete_one()
+
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt
+
+    def delete_all(self) -> None: 
+        """
+        Delete all stored passwords
+
+        Raises 
+            PermissionError -- No permission to use
+            KeyboardInterrupt -- User Interrupts the program
+        
+        Returns 
+            Database file empty
+        """
+        try:
+            self.db.stored_passwords(self.master_pw)
+        except PermissionError: 
+            return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+
+        try:
+            confirm = str(input("Are you sure you want to delete all normal passwords? (Y/n) "))
+            if confirm == "y".strip().lower():
+                self.db.delete_all()
+            elif confirm == "exit".strip().lower():
+                print("[cyan]Thanks for using.[/cyan]")
+                exit(1)
+            elif confirm == "".strip().lower():
+                return self.delete_all()
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt

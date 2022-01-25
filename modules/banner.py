@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from rich import print
-from rich.text import Text
 
 __author__ = "vlHan"
 __version__ = "V1.2"

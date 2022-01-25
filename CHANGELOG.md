@@ -23,7 +23,7 @@ This is the initial version.
 ## [V1.2] - 2022-01-23
 ### Added
 - Exceptions (KeyboardInterrupt) and exit config
-- Colors
+- Colors (rich)
 - See only one information (`stored_passwords()`)
     - It shows just the platofrm and the ID
 - Checkmark and x mark
@@ -34,3 +34,14 @@ This is the initial version.
 
 ### Removed
 - Old show informations function (`see_all()`)
+
+## [V1.3] - 2022-01-25
+### Added
+- Code optimization using new functions 
+- New password generator function
+
+### Changed
+- instance of menu and database class in `modules/main.py`
+
+### Removed
+- unused functions
