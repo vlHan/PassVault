@@ -17,9 +17,10 @@ class Manager:
     Arguments
         obj [Function] -- create instance of a class
     """
-    def __init__(self, obj) -> None:
+    def __init__(self) -> None:
         self.master_pw  = None
-        self.obj_ = obj
+        self.xmark_ = '\u2717'
+        self.checkmark_ = '\u2713'
     
     def exit_program(self) -> None:
         print("[red]Exiting the program...[/red]")
@@ -40,10 +41,10 @@ class Manager:
             self.master_pw = getpass.getpass("").strip()
             
             if hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() == stored_master:
-                print(f'[green]{self.obj_.checkmark_} Logged with success![/green]')
+                print(f'[green]{self.checkmark_} Logged with success![/green]')
                 while True:
                     # create instance of menu class
-                    menu = Menu(self.master_pw)
+                    menu = Menu(self.master_pw, Manager())
 
                     try:
                         menu.begin_program()
@@ -52,7 +53,7 @@ class Manager:
                         self.exit_program()
 
             else:
-                print(f'[red]{self.obj_.xmark_} The master password is not correct[/red]')
+                print(f'[red]{self.xmark_} The master password is not correct[/red]')
                 return self.main()
     
         except sqlite3.Error: 
@@ -70,11 +71,11 @@ class Manager:
                 
             if self.master_pw == verify_master:
                 if self.master_pw.isnumeric() or self.master_pw.isspace():
-                    print(f'\n[red]{self.obj_.checkmark_} The password is not correct. Please try again[/red]')
+                    print(f'\n[red]{self.checkmark_} The password is not correct. Please try again[/red]')
                     return self.main()
 
                 elif len(self.master_pw) < 8:
-                    print(f'\n[red]{self.obj_.xmark_} The password must have at least 8 caracters.[/red]')
+                    print(f'\n[red]{self.xmark_} The password must have at least 8 caracters.[/red]')
                     return self.main()
 
                 else:
@@ -86,9 +87,9 @@ class Manager:
                     cursor.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
                     db.commit()
                     
-                    print(f"\n[green]{self.obj_.checkmark_} Thank you! Restart the program and enter your master password to begin.[/green]")
+                    print(f"\n[green]{self.checkmark_} Thank you! Restart the program and enter your master password to begin.[/green]")
                     exit(1)
             
             else:
-                print(f'\n[red]{self.obj_.checkmark_} Password do not match. Please try again.[/red]')
+                print(f'\n[red]{self.checkmark_} Password do not match. Please try again.[/red]')
                 return self.main()
