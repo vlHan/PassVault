@@ -7,15 +7,16 @@
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
 
-Command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQLite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**. This software is used at your own risks. It is provided as is and I (including any contributors) do not take any responsibility for any damage or loss done with or by it.
+[![asciicast](https://asciinema.org/a/tJaauMOKBy6tp47KSDEQxkm3H.svg)](https://asciinema.org/a/tJaauMOKBy6tp47KSDEQxkm3H)
+
+## What is this? 
+Command-line password manager, for educational purposes, that stores localy, in AES encryption, your sensitives datas in a SQLite database (.db). This project was made to learn more about cryptography and **not for intended for actual use**.
 
 ## Installation
 Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
 - Enter the folder: `cd PassVault/`
 - Install python3 
   - Linux
-    - `sudo apt-get install python3`
-    - `chmod +x *`
     - `python3 -m pip install -r requirements.txt`
     - Finished!
 
@@ -25,12 +26,21 @@ Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a 
     - Finished!
 
 ## Usage
+Run the program in the diretory:
 ```bash
-# Run the program in the diretory
+# Linux 
 $ python3 .
 
-# Run the program out of the diretory 
+# Windows
+$ python .
+```
+Run the program out of the diretory:
+```bash
+# Linux 
 $ python3 PassVault
+
+# Windows
+$ python PassVault
 ```
 
 **⚠️** The program needs all the files, be sure to have all the dependecies and files <a href="https://github.com/vlHan/PassVault#installation">installed</a>.
@@ -70,20 +80,16 @@ The encryption method used in this program comes from the python library [PyCryp
 ### SQLite Functions
 The SQLite database is used to store sensitive data, as mentioned above. This type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is localy lost, you only need the password manager to be able to decrypt the passwords stored in your backup database.
 
-## Demo
-<img src="./demo/demo.gif" height="50%" width="100%"><br>
+## Contributors
+See also the list of contributors who participated in this project.
 
-## Built With
-* [Python](https://www.python.org) - The language used
+- **[vlHan](https://github.com/vlHan)** - *Initial work* 
+- **[carvalinh0](https://github.com/carvalinh0)** - *AES encryption* 
 
 ## Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct.
 
-## Authors
-- **vlHan** - *Initial work* - [vlHan](https://github.com/vlHan)
-- **Carvalinho** - *helped me in the AES encryption* - [carvalinh0](https://github.com/carvalinh0)
-
-See also the list of [contributors](https://github.com/vlHan/PassVault/contributors) who participated in this project.
-
 ## License 
 This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/vlHan/PassVault/blob/master/LICENSE) file for details
+
+[⬆ Back to top](https://github.com/vlHan/PassVault#)<br>
