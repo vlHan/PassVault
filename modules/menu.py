@@ -15,9 +15,9 @@ class Menu:
     Arguments
         master_pw [str] -- master password
     """
-    def __init__(self, master_pw: str) -> None:
-        self.master_pw = master_pw
-        self.db = DataBase()
+    def __init__(self, master_pw: str, obj) -> None:
+        self.obj_ = obj
+        self.db = DataBase(obj, master_pw)
 
     def begin_program(self) -> str:
         """
@@ -39,7 +39,7 @@ class Menu:
             # add password
             try:
                 platform, mail, password, url = self.inform_data()
-                self.db.save_password(platform, mail, password, url, self.master_pw)
+                self.db.save_password(platform, mail, password, url)
             except KeyboardInterrupt: 
                 raise KeyboardInterrupt
 
@@ -72,7 +72,7 @@ class Menu:
                 raise KeyboardInterrupt
         
         else: 
-            print(f'[red]{self.db.xmark_} Invalid option.[/red]')
+            print(f'[red]{self.obj_.xmark_} Invalid option.[/red]')
             return self.begin_program()
 
     def menu_interface(self) -> None:
@@ -111,14 +111,14 @@ class Menu:
             platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
             if platform.isnumeric() or platform.isspace():
-                print(f"[red]{self.db.xmark_}Enter a valid answer[/red]")
+                print(f"[red]{self.obj_.xmark_}Enter a valid answer[/red]")
                 return self.__begin_informations()
 
             mail = str(input("Enter the email for this account: ")).lower().strip()
             url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
 
             if not url.startswith("http"):
-                print(f"[red]{self.db.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.[/red]")
+                print(f"[red]{self.obj_.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.[/red]")
                 sleep(1)
 
                 return self.__begin_informations()
@@ -131,7 +131,7 @@ class Menu:
                 except requests.ConnectionError:
                     # If the connection does not work, the URL is incorrect.
                     # Then the question will return
-                    print(f"[red]{self.db.xmark_} Invalid URL.[/red]")
+                    print(f"[red]{self.obj_.xmark_} Invalid URL.[/red]")
                     sleep(1)
 
                     return self.__begin_informations()
@@ -167,7 +167,7 @@ class Menu:
         """
 
         generated_pass = self.db.generate_password()
-        loop = str(input("Generate a new password? (Y/N): ")).lower().strip()
+        loop = str(input("Generate a new password? (Y/n): ")).lower().strip()
         if loop == "exit":
             exit('Thanks for using.')
         elif (loop == 'y') or (loop.strip() == ""):
@@ -186,20 +186,23 @@ class Menu:
             New SQLite system application.
         """
         try:
-            self.db.stored_passwords(self.master_pw)
+            self.db.stored_passwords()
         except PermissionError: 
-            return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
         
         option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
-        new = str(input(f"\nEnter the new {option} which you want add in the database: ")).strip()
-
         if option not in ['platform', 'email', 'password', 'url']: 
-            return print(f'[red]{self.db.xmark_} Enter a valid answer.[/red]')
-        elif option == "" or new == "": 
-            return print(f'[red]{self.db.xmark_} Inputs could not be empty.[/red]')
-        elif option == "url":
+            print(f'[red]{self.obj_.xmark_} Enter a valid answer.[/red]\n')
+            return self.edit_password()
+        new = str(input(f"Enter the new {option} which you want add in the database: ")).strip()
+
+        if option == "" or new == "": 
+            print(f'[red]{self.obj_.xmark_} Inputs could not be empty.[/red]\n')
+            return self.edit_password()
+
+        if option == "url":
             if not new.startswith("http"):
-                print(f"[red]{self.db.xmark_}\n The URL must contain http:// or https:// in the beginning.[/red]\n")
+                print(f"[red]\n {self.obj_.xmark_} The URL must contain http:// or https:// in the beginning.[/red]\n")
                 sleep(1)
                 return self.edit_password()
 
@@ -210,12 +213,12 @@ class Menu:
                 except requests.ConnectionError:
                     # If the connection does not work, the URL is incorrect.
                     # Then the question will return
-                    print(f"[red]\n{self.db.xmark_} Invalid URL. Please try again.\n[/red]")
+                    print(f"[red]\n{self.obj_.xmark_} Invalid URL. Please try again.\n[/red]")
                     sleep(1)
                     return self.edit_password()
 
         id_opt = str(input(f"\nEnter the ID from the {option}: "))
-        self.db.edit_password(self.master_pw, new, option, id_opt)
+        self.db.edit_password(new, option, id_opt)
 
     def look_up(self) -> None:
         """
@@ -230,12 +233,12 @@ class Menu:
         """ 
         try:
             try:
-                self.db.stored_passwords(self.master_pw)
+                self.db.stored_passwords()
             except PermissionError: 
-                return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+                return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
             id_opt = str(input('Enter ID for the password you want to retrieve: ')).strip()
-            self.db.look_up(self.master_pw, id_opt)
+            self.db.look_up(id_opt)
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
 
@@ -251,9 +254,9 @@ class Menu:
             A password deleted
         """
         try:
-            self.db.stored_passwords(self.master_pw)
+            self.db.stored_passwords()
         except PermissionError: 
-            return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
 
         try:
@@ -267,14 +270,20 @@ class Menu:
                 id = str(input("Enter the ID of the password which you want delete: ")).strip()
                 return self.db.delete_normal(id)
             elif delete_pwd == "master":
-                print('[bold red]NOTE: If you delete the master password you will lost all your sensitives data and will be logged out[/red]')
+                print('[red]NOTE: If you delete the master password you will lost all your sensitives data and will be logged out[/red]')
                 confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
 
                 if confirm == "y":
-                    return self.db.delete_master()
+                    self.db.delete_master()
+                    sleep(1)
+                    print("[green]Done. All passwods including the master password were deleted with success.[/green]")
+                    sleep(1)
+                    print('[red]Now you will be logged out.[/red]')
+                    print('[cyan]Thanks for using.[/cyan]')
+                    exit(1)
                 
                 elif confirm != "n": 
-                    return self.delete_one()
+                    return
 
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
@@ -291,9 +300,9 @@ class Menu:
             Database file empty
         """
         try:
-            self.db.stored_passwords(self.master_pw)
+            self.db.stored_passwords()
         except PermissionError: 
-            return print(f"[red]{self.db.xmark_} The database is empty. Try adding a password.[/red]")
+            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
         try:
             confirm = str(input("Are you sure you want to delete all normal passwords? (Y/n) "))
