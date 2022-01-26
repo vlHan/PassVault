@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from sqlite3 import DatabaseError
-
-
 try:
     import Crypto
     import requests
@@ -13,5 +10,5 @@ except ImportError:
 
 if __name__ == '__main__':
     from modules import *
-    
-    Manager(DataBase()).main()
+
+    Manager().main()
