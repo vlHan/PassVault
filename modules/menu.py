@@ -112,7 +112,7 @@ class Menu:
 
             if platform.isnumeric() or platform.isspace():
                 print(f"[red]{self.obj_.xmark_}Enter a valid answer[/red]")
-                return self.__begin_informations()
+                return self.inform_data()
 
             mail = str(input("Enter the email for this account: ")).lower().strip()
             url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
@@ -121,7 +121,7 @@ class Menu:
                 print(f"[red]{self.obj_.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.[/red]")
                 sleep(1)
 
-                return self.__begin_informations()
+                return self.inform_data()
 
             elif url.startswith("http"):
                 try:
@@ -134,7 +134,7 @@ class Menu:
                     print(f"[red]{self.obj_.xmark_} Invalid URL.[/red]")
                     sleep(1)
 
-                    return self.__begin_informations()
+                    return self.inform_data()
 
             want_gen = str(input(f"Do you want to generate a password for {platform}? (Y/n): ")).lower().strip()
             # Generate a password for a platform.
@@ -152,7 +152,7 @@ class Menu:
 
             else:
                 print("[red]Enter a valid answer.[/red]")
-                return self.__begin_informations()
+                return self.inform_data()
             
             return (platform, mail, password, url)
 
@@ -190,7 +190,7 @@ class Menu:
         except PermissionError: 
             return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
         
-        option = str(input("What do you want to change? (platform/email/password/url) ")).lower().strip()
+        option = str(input("\nWhat do you want to change? (platform/email/password/url) ")).lower().strip()
         if option not in ['platform', 'email', 'password', 'url']: 
             print(f'[red]{self.obj_.xmark_} Enter a valid answer.[/red]\n')
             return self.edit_password()
@@ -237,8 +237,8 @@ class Menu:
             except PermissionError: 
                 return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
-            id_opt = str(input('Enter ID for the password you want to retrieve: ')).strip()
-            self.db.look_up(id_opt)
+            id_opt = str(input('\nEnter ID for the password you want to retrieve: ')).strip()
+            print(self.db.look_up(id_opt))
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
 
@@ -260,7 +260,7 @@ class Menu:
 
 
         try:
-            delete_pwd = str(input("Delete normal password or master password? (normal/master) ").lower().strip())
+            delete_pwd = str(input("\nDelete normal password or master password? (normal/master) ").lower().strip())
 
             if delete_pwd == "exit":
                 exit("[cyan]Thanks for using.[/cyan]")
@@ -275,9 +275,7 @@ class Menu:
 
                 if confirm == "y":
                     self.db.delete_master()
-                    sleep(1)
-                    print("[green]Done. All passwods including the master password were deleted with success.[/green]")
-                    sleep(1)
+                    print("[green]Done. All passwods including the master password were successfully deleted.[/green]")
                     print('[red]Now you will be logged out.[/red]')
                     print('[cyan]Thanks for using.[/cyan]')
                     exit(1)
@@ -305,7 +303,7 @@ class Menu:
             return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
         try:
-            confirm = str(input("Are you sure you want to delete all normal passwords? (Y/n) "))
+            confirm = str(input("\nAre you sure you want to delete all normal passwords? (Y/n) "))
             if confirm == "y".strip().lower():
                 self.db.delete_all()
             elif confirm == "exit".strip().lower():
