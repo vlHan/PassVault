@@ -3,7 +3,7 @@
 <p>
    <img alt="Languages" src="https://img.shields.io/badge/python->=3.0-blue.svg"> 
    <img alt="Repository size" src="https://img.shields.io/github/repo-size/vlHan/PassVault">
-   <img alt="License" src="https://img.shields.io/badge/build-Passing-green">
+   <img alt="Build" src="https://img.shields.io/badge/build-Passing-green">
    <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
 </p>
 
