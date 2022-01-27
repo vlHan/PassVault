@@ -272,16 +272,10 @@ class DataBase:
         """
         Delete master password all the data
         """
-        self.obj_.cursor.execute("SELECT COUNT(*) from passwords;")
-        if self.obj_.cursor.fetchall()[0][0] == 0: 
-            # verify if the database is empty - cannot opperate in a empty database
-            print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
-
-        else:
-            print("[red]Deleting all the passwords...[/red]")
-            self.obj_.cursor.execute("DROP TABLE passwords;")
-            self.obj_.cursor.execute("DROP TABLE masterpassword;")
-            self.obj_.datab.commit()
+        print("[red]Deleting all the passwords...[/red]")
+        self.obj_.cursor.execute("DROP TABLE passwords;")
+        self.obj_.cursor.execute("DROP TABLE masterpassword;")
+        self.obj_.datab.commit()
 
     def delete_all(self) -> None:
         """

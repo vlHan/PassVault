@@ -22,7 +22,7 @@ class Manager:
         self.master_pw  = None
         self.xmark_ = '\u2717'
         self.checkmark_ = '\u2713'
-        self.datab = sqlite3.connect('vault.db') 
+        self.datab = sqlite3.connect('./PassVault/vault.db') 
         self.cursor = self.datab.cursor()
     
     def exit_program(self) -> None:

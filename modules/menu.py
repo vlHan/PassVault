@@ -245,7 +245,7 @@ class Menu:
 
     def delete_one(self) -> None:
         """
-        Delete a password
+        Delete a password normal or master
         
         Raises 
             PermissionError -- No permission to use
@@ -254,11 +254,6 @@ class Menu:
         Returns 
             A password deleted
         """
-        try:
-            self.db.stored_passwords()
-        except PermissionError: 
-            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
-
 
         try:
             delete_pwd = str(input("\nDelete normal password or master password? (normal/master) ").lower().strip())
@@ -268,6 +263,10 @@ class Menu:
             elif delete_pwd == "":
                 return self.delete_one()
             elif delete_pwd == "normal":
+                try:
+                    self.db.stored_passwords()
+                except PermissionError: 
+                    return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
                 id = str(input("Enter the ID of the password which you want delete: ")).strip()
                 return self.db.delete_normal(id)
             elif delete_pwd == "master":
