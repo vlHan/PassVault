@@ -3,6 +3,7 @@ try:
     import Crypto
     import requests
     import colorama
+    import rich
 except ImportError:
     import os
     os.system("pip install -r requirements.txt")
