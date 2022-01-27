@@ -21,7 +21,7 @@ class DataBase:
     it at https://github.com/vlHan/PassVault/issues
     """
 
-    def __init__(self, obj, master_pssw) -> None:
+    def __init__(self, obj, master_pssw: str) -> None:
         self.datab = sqlite3.connect("vault.db")
         self.cursor = self.datab.cursor()
         self.obj_ = obj
@@ -88,25 +88,25 @@ class DataBase:
     
     def generate_password(self) -> None:
         """Returns generated password
-
+        
         Returns
             [str] -- A random password
         """
-        pwd_len = int(input("What length would you like your password to be? (At least 8) "))
+        pw_len = int(input("What length would you like your password to be? (At least 8) "))
 
-        if pwd_len < 8:
+        if pw_len < 8:
             print("\n[red] The password is not long enough. Please try again.[/red]\n")
             return self.generate_password()
         else:
             # Generating a password
             password = [random.choice(random.choice([
-                string.ascii_lowercase,
-                string.ascii_uppercase,
-                string.digits,
-                self.specialchars
-            ])) for _ in range(pwd_len)]
+                *self.specialchars,
+                *string.ascii_lowercase,
+                *string.ascii_uppercase,
+                *string.digits
+            ])) for _ in range(pw_len)]
 
-            print('\n[yellow]Generated password:[/yellow]', ''.join(password))
+            print(f'\n[yellow]Generated password:[/yellow] {"".join(password)}')
             return ''.join(password)
 
     def save_password(self, platform: str, mail: str, password: str, url: str) -> None:
@@ -169,7 +169,7 @@ class DataBase:
             id_list = [row[0] for row in self.cursor.execute("SELECT * FROM passwords;")]
             if id_opt not in str(id_list): 
                 return print(f"[red]{self.obj_.xmark_} The ID is not correct[/red]")
-
+            
             initial_value, concatenate = self.encryption(new, self.master_pw[:32])
             ct_new_info = initial_value + "|" + concatenate
             
@@ -215,16 +215,20 @@ class DataBase:
             ]
             
             infos.clear()
-            print(f"\n[yellow][ID: {row[0]}] {decrypted[0].decode()}[/yellow]\n[green]Email: {decrypted[1].decode()}\nPassword: {decrypted[2].decode()}\nURL: {decrypted[3].decode()}\n[/green]")
+            return (f"\n[yellow][ID: {row[0]}] {decrypted[0].decode()}[/yellow]\n"
+                f"[green]Email: {decrypted[1].decode()}\n"
+                f"Password: {decrypted[2].decode()}\n"
+                f"URL: {decrypted[3].decode()}[/green]\n"
+            )
 
     def stored_passwords(self) -> None: 
-        """Stored passwords
         """
-        try:
-            self.cursor.execute("SELECT COUNT(*) from passwords;")
-        except sqlite3.OperationalError: 
-            pass
+        Stored passwords
 
+        Returns 
+            [str] -- List of passwords
+        """
+        self.cursor.execute("SELECT COUNT(*) from passwords;")
         if self.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
             raise PermissionError
@@ -245,10 +249,9 @@ class DataBase:
             ]
             
             infos.clear()
+
             print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0].decode()}[/yellow]")
         
-        print()
-            
     def delete_normal(self, id_opt: str) -> None:
         """Delete one password
 
@@ -283,7 +286,6 @@ class DataBase:
             self.cursor.execute("DROP TABLE passwords;")
             self.cursor.execute("DROP TABLE masterpassword;")
             self.datab.commit()
-            
 
     def delete_all(self) -> None:
         """
