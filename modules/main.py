@@ -1,26 +1,29 @@
 # -*- coding: utf-8 -*-
 from modules import *
 
-import sqlite3
-import hashlib 
-import hmac
-import getpass
-
 from time import sleep
 import random, string
 from sys import exit
 
+import getpass
+import sqlite3
+
+import hashlib 
+import hmac
+from backports.pbkdf2 import pbkdf2_hmac
+import binascii
+
+
 class Manager:
     """
     Manager class 
-    
-    Arguments
-        obj [Function] -- create instance of a class
     """
     def __init__(self) -> None:
         self.master_pw  = None
         self.xmark_ = '\u2717'
         self.checkmark_ = '\u2713'
+        self.datab = sqlite3.connect('vault.db') 
+        self.cursor = self.datab.cursor()
     
     def exit_program(self) -> None:
         print("[red]Exiting the program...[/red]")
@@ -30,10 +33,9 @@ class Manager:
         """Main function to verify the user
         """
         try:
-            cursor = sqlite3.connect('vault.db').cursor()
-            cursor.execute("SELECT * FROM masterpassword")
+            self.cursor.execute("SELECT * FROM masterpassword")
             
-            for row in cursor.fetchall():
+            for row in self.cursor.fetchall():
                 stored_master = row[0]
                 salt = row[1] 
 
@@ -42,6 +44,10 @@ class Manager:
             
             if hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() == stored_master:
                 print(f'[green]{self.checkmark_} Logged with success![/green]')
+                
+                key = pbkdf2_hmac("sha3-256", self.master_pw.encode("utf-8"), str(salt).encode(), 500000, 16)
+                self.master_pw = binascii.hexlify(key).decode()
+
                 while True:
                     # create instance of menu class
                     menu = Menu(self.master_pw, Manager())
@@ -57,8 +63,6 @@ class Manager:
                 return self.main()
     
         except sqlite3.Error: 
-            with sqlite3.connect('vault.db') as db: 
-                cursor = db.cursor()
             print('[green]To start, you have to create a master password. Be careful not to lose it as it is unrecoverable[/green]')
             
             try:
@@ -79,13 +83,13 @@ class Manager:
                     return self.main()
 
                 else:
-                    cursor.execute("CREATE TABLE IF NOT EXISTS masterpassword (password TEXT NOT NULL, salt TEXT NOT NULL);")
+                    self.cursor.execute("CREATE TABLE IF NOT EXISTS masterpassword (password TEXT NOT NULL, salt TEXT NOT NULL);")
                     salt = "".join(random.choice(string.ascii_uppercase + 
                                                 string.digits + 
                                                 string.ascii_lowercase) for _ in range(32))
                     master = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
-                    cursor.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
-                    db.commit()
+                    self.cursor.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
+                    self.datab.commit()
                     
                     print(f"\n[green]{self.checkmark_} Thank you! Restart the program and enter your master password to begin.[/green]")
                     exit(1)

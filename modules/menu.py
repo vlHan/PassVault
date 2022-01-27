@@ -14,6 +14,7 @@ class Menu:
 
     Arguments
         master_pw [str] -- master password
+        obj [Class] -- create instance of a class
     """
     def __init__(self, master_pw: str, obj) -> None:
         self.obj_ = obj

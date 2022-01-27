@@ -19,14 +19,16 @@ class DataBase:
     
     If has an error which should not exist, please report 
     it at https://github.com/vlHan/PassVault/issues
+
+    Arguments
+        obj [Class] -- create instance of a class
+        master_pw [str] -- master password
     """
 
     def __init__(self, obj, master_pssw: str) -> None:
-        self.datab = sqlite3.connect("vault.db")
-        self.cursor = self.datab.cursor()
         self.obj_ = obj
         # Connect with the SQlite and create the table.
-        self.cursor.execute(
+        self.obj_.cursor.execute(
             """CREATE TABLE IF NOT EXISTS passwords (
                 id INTEGER PRIMARY KEY,
                 platform TEXT NOT NULL,
@@ -35,13 +37,7 @@ class DataBase:
                 url TEXT NOT NULL
             );"""
         )
-        self.cursor.execute("SELECT * FROM masterpassword;")
-        for row in self.cursor.fetchall():
-            # Select the salt of the master password
-            salt = row[1] 
-        # Putting together the master password with the salt 
-        # to use in the verificantion and in the encryption and decryption 
-        self.master_pw = master_pssw + salt
+        self.master_pw = master_pssw
         self.specialchars = "_!@#$%&*()-"
 
     def encryption(self, pssw: str, key: str) -> tuple:
@@ -122,13 +118,13 @@ class DataBase:
         Returns 
             [tuple] -- Sensitives datas saved in the SQLite.
         """
-        self.cursor.execute("SELECT id FROM passwords;")
+        self.obj_.cursor.execute("SELECT id FROM passwords;")
         # The ID must be the length of the datas stored in the database plus one
         # then the user can change/delete informations.
-        id = len(self.cursor.fetchall())
+        id = len(self.obj_.cursor.fetchall())
 
         while True:
-            if id in self.cursor.execute("SELECT id FROM passwords;"):
+            if id in self.obj_.cursor.execute("SELECT id FROM passwords;"):
                 # Verify if the ID exist in the database
                 # if exist the code will add one more
                 id += 1
@@ -139,12 +135,12 @@ class DataBase:
         infos = []
         stored_infos = [platform, mail, password, url]
         for i in stored_infos:
-            initial_value, contatenate = self.encryption(i, self.master_pw[:32])
+            initial_value, contatenate = self.encryption(i, self.master_pw)
             concatenate = initial_value + "|" + contatenate
             infos.append(concatenate)
         # Insert each value in the table passwords
-        self.cursor.execute(f"""INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')""")
-        self.datab.commit()
+        self.obj_.cursor.execute(f"""INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')""")
+        self.obj_.datab.commit()
 
         print(f"[green]\n{self.obj_.checkmark_} Thank you! Datas were successfully added.[/green]")
 
@@ -160,21 +156,21 @@ class DataBase:
         Returns
             [str] The new password changed in the database
         """
-        self.cursor.execute("SELECT COUNT(*) from passwords;")
-        if self.cursor.fetchall()[0][0] == 0: 
+        self.obj_.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.obj_.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
             print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
-            id_list = [row[0] for row in self.cursor.execute("SELECT * FROM passwords;")]
+            id_list = [row[0] for row in self.obj_.cursor.execute("SELECT * FROM passwords;")]
             if id_opt not in str(id_list): 
                 return print(f"[red]{self.obj_.xmark_} The ID is not correct[/red]")
             
-            initial_value, concatenate = self.encryption(new, self.master_pw[:32])
+            initial_value, concatenate = self.encryption(new, self.master_pw)
             ct_new_info = initial_value + "|" + concatenate
             
-            self.cursor.execute(f"""UPDATE passwords SET {option} = '{ct_new_info}' WHERE id = '{id_opt}'""")
-            self.datab.commit()
+            self.obj_.cursor.execute(f"""UPDATE passwords SET {option} = '{ct_new_info}' WHERE id = '{id_opt}'""")
+            self.obj_.datab.commit()
 
             print(f"[green]{self.obj_.checkmark_} The {option} of the ID {id_opt} has successfully changed to {new}.[/green]")
 
@@ -189,17 +185,17 @@ class DataBase:
             [tuple] The passwords stored
         """
 
-        self.cursor.execute("SELECT COUNT(*) from passwords;")
-        if self.cursor.fetchall()[0][0] == 0:
+        self.obj_.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.obj_.cursor.fetchall()[0][0] == 0:
             # verify if the database is empty - cannot opperate in a empty database
             print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
-        id_list = [row[0] for row in self.cursor.execute("SELECT * FROM passwords;")]
+        id_list = [row[0] for row in self.obj_.cursor.execute("SELECT * FROM passwords;")]
         if id_opt not in str(id_list): 
             return print(f"[red]{self.obj_.xmark_} The ID is not correct[/red]")
             
         infos = []
-        for row in self.cursor.execute(f"SELECT * FROM passwords WHERE id = '{id_opt}';"):
+        for row in self.obj_.cursor.execute(f"SELECT * FROM passwords WHERE id = '{id_opt}';"):
             infos.append(row[1])
             infos.append(row[2])
             infos.append(row[3])
@@ -209,7 +205,7 @@ class DataBase:
                 self.decryption(
                     str(i).split("|")[0], 
                     str(i).split("|")[1],
-                    self.master_pw[:32]
+                    self.master_pw
                 )
                 for i in infos
             ]
@@ -228,14 +224,14 @@ class DataBase:
         Returns 
             [str] -- List of passwords
         """
-        self.cursor.execute("SELECT COUNT(*) from passwords;")
-        if self.cursor.fetchall()[0][0] == 0: 
+        self.obj_.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.obj_.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
             raise PermissionError
         
         print('[yellow]Current passwords stored:[/yellow]')
         infos = []
-        for row in self.cursor.execute("SELECT * FROM passwords;"):
+        for row in self.obj_.cursor.execute("SELECT * FROM passwords;"):
             infos.append(row[1])
             infos.append(row[2])
 
@@ -243,7 +239,7 @@ class DataBase:
                 self.decryption(
                     str(i).split("|")[0], 
                     str(i).split("|")[1],
-                    self.master_pw[:32]
+                    self.master_pw
                 )
                 for i in infos
             ]
@@ -258,34 +254,34 @@ class DataBase:
         Arguments 
             id_opt [str] -- the ID chosed
         """
-        self.cursor.execute("SELECT COUNT(*) from passwords;")
-        if self.cursor.fetchall()[0][0] == 0: 
+        self.obj_.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.obj_.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
             print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
-            id_list = [row[0] for row in self.cursor.execute("SELECT * FROM passwords;")]
+            id_list = [row[0] for row in self.obj_.cursor.execute("SELECT * FROM passwords;")]
             if id_opt not in str(id_list): 
                 return print(f"[red]{self.obj_.xmark_} The ID is not correct[/red]")
 
-            self.cursor.execute(f"DELETE from passwords WHERE id = '{id_opt}'") 
-            self.datab.commit()
+            self.obj_.cursor.execute(f"DELETE from passwords WHERE id = '{id_opt}'") 
+            self.obj_.datab.commit()
             print(f"[green]\n{self.obj_.checkmark_} The password was successfully deleted.\n[/green]")
 
     def delete_master(self):
         """
         Delete master password all the data
         """
-        self.cursor.execute("SELECT COUNT(*) from passwords;")
-        if self.cursor.fetchall()[0][0] == 0: 
+        self.obj_.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.obj_.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
             print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
         else:
             print("[red]Deleting all the passwords...[/red]")
-            self.cursor.execute("DROP TABLE passwords;")
-            self.cursor.execute("DROP TABLE masterpassword;")
-            self.datab.commit()
+            self.obj_.cursor.execute("DROP TABLE passwords;")
+            self.obj_.cursor.execute("DROP TABLE masterpassword;")
+            self.obj_.datab.commit()
 
     def delete_all(self) -> None:
         """
@@ -295,8 +291,8 @@ class DataBase:
         Returns
             DataBase empty (SQlite)
         """
-        self.cursor.execute("SELECT COUNT(*) from passwords;")
-        if self.cursor.fetchall()[0][0] == 0: 
+        self.obj_.cursor.execute("SELECT COUNT(*) from passwords;")
+        if self.obj_.cursor.fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
             print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
 
@@ -306,8 +302,8 @@ class DataBase:
             sleep(2)
 
             # Dropping the datable
-            self.cursor.execute("DROP TABLE passwords;")
-            self.datab.commit()
+            self.obj_.cursor.execute("DROP TABLE passwords;")
+            self.obj_.datab.commit()
 
             sleep(1)
             print(f"[green]{self.obj_.checkmark_} Done. All the passwords stored had been deleted with success.[/green]")
