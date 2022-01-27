@@ -5,6 +5,8 @@ import sqlite3
 import hashlib 
 import hmac
 import getpass
+from backports.pbkdf2 import pbkdf2_hmac
+import binascii
 
 from time import sleep
 import random, string
@@ -42,6 +44,10 @@ class Manager:
             
             if hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() == stored_master:
                 print(f'[green]{self.checkmark_} Logged with success![/green]')
+                
+                key = pbkdf2_hmac("sha3-256", self.master_pw.encode("utf-8"), str(salt).encode(), 500000, 16)
+                self.master_pw = binascii.hexlify(key).decode()
+                
                 while True:
                     # create instance of menu class
                     menu = Menu(self.master_pw, Manager())
