@@ -1,11 +1,6 @@
 # <a href="https://github.com/vlHan/PassVault"><img src="./demo/logo.png"></a>
 
-<p>
-   <img alt="Languages" src="https://img.shields.io/badge/python->=3.0-blue.svg"> 
-   <img alt="Repository size" src="https://img.shields.io/github/repo-size/vlHan/PassVault">
-   <img alt="Build" src="https://img.shields.io/badge/build-Passing-green">
-   <img alt="License" src="https://img.shields.io/github/license/vlHan/PassVault.svg">
-</p>
+[![python](https://img.shields.io/badge/Python-3.5%20%7C%203.6%20%7C%203.7%20%7C%203.8-blue.svg)](https://www.python.org) [![repo size](https://img.shields.io/github/repo-size/vlHan/PassVault)](#) [![build](https://img.shields.io/badge/build-Passing-green)](#) [![license](https://img.shields.io/github/license/vlHan/PassVault.svg)](LICENSE)
 
 [![asciicast](https://asciinema.org/a/tJaauMOKBy6tp47KSDEQxkm3H.svg)](https://asciinema.org/a/tJaauMOKBy6tp47KSDEQxkm3H)
 
