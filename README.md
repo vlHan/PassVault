@@ -16,33 +16,35 @@ Command-line password manager, for educational purposes, that stores localy, in 
 Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
 - Enter the folder: `cd PassVault/`
 - Install python3 
-  - Linux
+  - Linux and macOS
     - `python3 -m pip install -r requirements.txt`
     - Finished!
 
-  - Windows and Mac
+  - Windows
     - [Python 3, download and install](https://www.python.org/downloads/)
     - `python -m pip install -r requirements.txt`
     - Finished!
 
 ## Usage
-Run the program in the diretory:
+Use the following commands to run the program in the diretory or out of the diretory
+
 ```bash
-# Linux 
+# Linux and macOS
 $ python3 .
 
-# Windows
-$ python .
-```
-Run the program out of the diretory:
-```bash
-# Linux 
+or 
+
 $ python3 PassVault
 
+```
+```bash
 # Windows
+$ python .
+
+or 
+
 $ python PassVault
 ```
-
 **⚠️** The program needs all the files, be sure to have all the dependecies and files <a href="https://github.com/vlHan/PassVault#installation">installed</a>.
 
 ## How It Works
@@ -90,6 +92,6 @@ See also the list of contributors who participated in this project.
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct.
 
 ## License 
-This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/vlHan/PassVault/blob/master/LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/vlHan/PassVault/blob/master/LICENSE) file for details
 
 [⬆ Back to top](https://github.com/vlHan/PassVault#)<br>
