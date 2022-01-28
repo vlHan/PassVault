@@ -21,24 +21,21 @@ Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a 
     - Finished!
 
 ## Usage
-Use the following commands to run the program in the diretory or out of the diretory
-
+Use the following commands to run the program
 ```bash
-# Linux and macOS
-$ python3 .
-
-or 
-
-$ python3 PassVault
-
-```
-```bash
-# Windows
-$ python .
-
-or 
-
-$ python PassVault
+Linux and macOS
+  # in the diretory
+  $ python3 .
+    
+  # out of the diretory
+  $ python3 PassVault
+    
+Windows
+  # in the diretory
+  $ python .
+    
+  # out of the diretory
+  $ python PassVault
 ```
 **⚠️** The program needs all the files, be sure to have all the dependecies and files <a href="https://github.com/vlHan/PassVault#installation">installed</a>.
 
