@@ -1,5 +1,4 @@
 # PassVault CHANGELOG
-
 All notable change to this project will be documented here.
 
 ## [Unreleased]
@@ -23,13 +22,14 @@ This is the initial version.
 ## [V1.2] - 2022-01-23
 ### Added
 - Exceptions (KeyboardInterrupt) and exit config
-- Colors (rich)
+- Colors library (_rich_)
 - See only one information (`stored_passwords()`)
     - It shows just the platofrm and the ID
 - Checkmark and x mark
 
 ### Changed
 - Manager class in `__main__.py` to `modules/main.py`
+- Remove _colorama_ as the color library to _rich_
 - to look up the password, need to know the ID using the function `stored_password()`
 
 ### Removed
