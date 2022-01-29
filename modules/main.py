@@ -15,16 +15,21 @@ import binascii
 
 
 class Manager:
-    """
-    Manager class 
-    """
     def __init__(self) -> None:
         self.master_pw  = None
         self.xmark_ = '\u2717'
         self.checkmark_ = '\u2713'
-        self.datab = sqlite3.connect('./PassVault/vault.db') 
-        self.cursor = self.datab.cursor()
+        self.conn = self.connect()
+        self.cur = self.conn.cursor()
     
+    def connect(self):
+        try:
+            self.conn = sqlite3.connect(f'./PassVault/{getpass.getuser()}.db')
+            return self.conn
+        except sqlite3.OperationalError: 
+            self.conn = sqlite3.connect(f'./{getpass.getuser()}.db')
+            return self.conn
+
     def exit_program(self) -> None:
         print("[red]Exiting the program...[/red]")
         exit(1)
@@ -33,9 +38,9 @@ class Manager:
         """Main function to verify the user
         """
         try:
-            self.cursor.execute("SELECT * FROM masterpassword")
+            self.cur.execute("SELECT * FROM masterpassword")
             
-            for row in self.cursor.fetchall():
+            for row in self.cur.fetchall():
                 stored_master = row[0]
                 salt = row[1] 
 
@@ -83,13 +88,13 @@ class Manager:
                     return self.main()
 
                 else:
-                    self.cursor.execute("CREATE TABLE IF NOT EXISTS masterpassword (password TEXT NOT NULL, salt TEXT NOT NULL);")
+                    self.cur.execute("CREATE TABLE IF NOT EXISTS masterpassword (password TEXT NOT NULL, salt TEXT NOT NULL);")
                     salt = "".join(random.choice(string.ascii_uppercase + 
                                                 string.digits + 
                                                 string.ascii_lowercase) for _ in range(32))
                     master = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
-                    self.cursor.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
-                    self.datab.commit()
+                    self.cur.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
+                    self.conn.commit()
                     
                     print(f"\n[green]{self.checkmark_} Thank you! Restart the program and enter your master password to begin.[/green]")
                     exit(1)

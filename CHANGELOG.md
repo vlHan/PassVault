@@ -45,3 +45,15 @@ This is the initial version.
 
 ### Removed
 - unused functions
+
+## [V1.4] - 2022-01-29
+### Added
+- New functions in the database file to avoid sqlite3 functions repetitions.
+- The name of the sqlite database is the name of your machine
+    - Be sure not to change the name or something, otherwise the program will create another file and you'll lose the database
+
+### Changed
+- Connection to the database file, now verify if the user is running in or out of the PassVault diretory
+
+### Removed
+- `vault.db` in `.gitignore`

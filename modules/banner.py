@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from rich import print
 
 __author__ = "vlHan"

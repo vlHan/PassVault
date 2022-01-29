@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from modules import *
 
 import requests
@@ -18,7 +17,34 @@ class Menu:
     """
     def __init__(self, master_pw: str, obj) -> None:
         self.obj_ = obj
-        self.db = DataBase(obj, master_pw)
+        self.db = DataConnect(master_pw, obj)
+
+    def colormk(self): 
+        ...
+    
+    def httpverify(self, url):
+        """
+        Verify the URL by sending HTTP request
+
+        Arguments
+            url [str] -- the URL of the platform
+
+        Returns 
+            If the URl is correct
+        """ 
+        if not url.startswith("http"):
+            print(f"[red]{self.obj_.xmark_} Invalid URL. The URL must contain http:// or https:// [/]")
+            sleep(1)
+
+            return self.inform_data()
+
+        elif url.startswith("http"):
+            try:
+                requests.get(url)
+            except requests.ConnectionError:
+                print(f"[red]{self.obj_.xmark_} Invalid URL.[/]")
+
+                return self.inform_data()
 
     def begin_program(self) -> str:
         """
@@ -31,10 +57,10 @@ class Menu:
             Informations to store in the database  
         """
         choice = self.menu_interface()
-        if choice in ["6", "exit"]:
+        if choice in ["7", "exit"]:
             # Exit
             print("[cyan]Thanks for using.[/cyan]")
-            exit(1)
+            exit(0)
 
         elif choice == "1":
             # add password
@@ -61,19 +87,26 @@ class Menu:
         elif choice == "4":
             # delete a password
             try: 
-                self.delete_one()
+                self.delete_one_password()
             except KeyboardInterrupt: 
                 raise KeyboardInterrupt
 
         elif choice == "5":
-            # delete all passwords
+            # delete all normal passwords
             try:
-                self.delete_all()
+                self.delete_all_passwords()
+            except KeyboardInterrupt: 
+                raise KeyboardInterrupt
+        
+        elif choice == "6": 
+            # delete all passwords including master password
+            try:
+                self.delete_all_data()
             except KeyboardInterrupt: 
                 raise KeyboardInterrupt
         
         else: 
-            print(f'[red]{self.obj_.xmark_} Invalid option.[/red]')
+            print(f'[red]{self.obj_.xmark_} Invalid option.[/]')
             return self.begin_program()
 
     def menu_interface(self) -> None:
@@ -84,12 +117,13 @@ class Menu:
             KeyboardInterrupt -- user interrupts
         """
         banner()
-        print("[blue] 1) Add a password[/blue]")
-        print("[blue] 2) Update informations[/blue]")
-        print("[blue] 3) Look up passwords[/blue]")
-        print("[red] 4) Delete a password (normal/master)[/red]")
-        print("[red] 5) Delete all normal passwords[/red]")
-        print("[red] 6) Exit the program[/red]")
+        print("[blue] 1) Add a password[/]"
+        "\n[blue] 2) Update informations[/]"
+        "\n[blue] 3) Look up passwords[/]"
+        "\n[red] 4) Delete a password[/]"
+        "\n[red] 5) Delete all passwords[/]"
+        "\n[red] 6) Delete all normal data[/]"
+        "\n[red] 7) Exit the program[/]")
 
         try:
             return str(input("\n └──Enter a choice: ")).strip()
@@ -112,30 +146,13 @@ class Menu:
             platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
 
             if platform.isnumeric() or platform.isspace():
-                print(f"[red]{self.obj_.xmark_}Enter a valid answer[/red]")
+                print(f"[red]{self.obj_.xmark_}Enter a valid answer[/]")
                 return self.inform_data()
 
             mail = str(input("Enter the email for this account: ")).lower().strip()
             url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
 
-            if not url.startswith("http"):
-                print(f"[red]{self.obj_.xmark_}Invalid URL. The URL must contain http:// or https:// in the beginning.[/red]")
-                sleep(1)
-
-                return self.inform_data()
-
-            elif url.startswith("http"):
-                try:
-                    # Make a request in the URL gaved.
-                    requests.get(url)
-
-                except requests.ConnectionError:
-                    # If the connection does not work, the URL is incorrect.
-                    # Then the question will return
-                    print(f"[red]{self.obj_.xmark_} Invalid URL.[/red]")
-                    sleep(1)
-
-                    return self.inform_data()
+            self.httpverify(url)
 
             want_gen = str(input(f"Do you want to generate a password for {platform}? (Y/n): ")).lower().strip()
             # Generate a password for a platform.
@@ -152,7 +169,7 @@ class Menu:
                 password = getpass.getpass(prompt=f"Enter the password which you want to add for {platform} in the database: ").strip()
 
             else:
-                print("[red]Enter a valid answer.[/red]")
+                print("[red]Enter a valid answer.[/]")
                 return self.inform_data()
             
             return (platform, mail, password, url)
@@ -189,34 +206,20 @@ class Menu:
         try:
             self.db.stored_passwords()
         except PermissionError: 
-            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
+            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
         
         option = str(input("\nWhat do you want to change? (platform/email/password/url) ")).lower().strip()
         if option not in ['platform', 'email', 'password', 'url']: 
-            print(f'[red]{self.obj_.xmark_} Enter a valid answer.[/red]\n')
+            print(f'[red]{self.obj_.xmark_} Enter a valid answer.[/]\n')
             return self.edit_password()
-        new = str(input(f"Enter the new {option} which you want add in the database: ")).strip()
+        new = str(input(f"Enter the new {option} which you want add: ")).strip()
 
         if option == "" or new == "": 
-            print(f'[red]{self.obj_.xmark_} Inputs could not be empty.[/red]\n')
+            print(f'[red]{self.obj_.xmark_} Inputs could not be empty.[/]\n')
             return self.edit_password()
 
         if option == "url":
-            if not new.startswith("http"):
-                print(f"[red]\n {self.obj_.xmark_} The URL must contain http:// or https:// in the beginning.[/red]\n")
-                sleep(1)
-                return self.edit_password()
-
-            elif new.startswith("http"):
-                try:
-                    # Make a HTTP request in the URL
-                    requests.get(new)
-                except requests.ConnectionError:
-                    # If the connection does not work, the URL is incorrect.
-                    # Then the question will return
-                    print(f"[red]\n{self.obj_.xmark_} Invalid URL. Please try again.\n[/red]")
-                    sleep(1)
-                    return self.edit_password()
+            self.httpverify(new)
 
         id_opt = str(input(f"\nEnter the ID from the {option}: "))
         self.db.edit_password(new, option, id_opt)
@@ -236,14 +239,14 @@ class Menu:
             try:
                 self.db.stored_passwords()
             except PermissionError: 
-                return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
+                return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
 
             id_opt = str(input('\nEnter ID for the password you want to retrieve: ')).strip()
             print(self.db.look_up(id_opt))
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
 
-    def delete_one(self) -> None:
+    def delete_one_password(self) -> None:
         """
         Delete a password normal or master
         
@@ -256,37 +259,17 @@ class Menu:
         """
 
         try:
-            delete_pwd = str(input("\nDelete normal password or master password? (normal/master) ").lower().strip())
-
-            if delete_pwd == "exit":
-                exit("[cyan]Thanks for using.[/cyan]")
-            elif delete_pwd == "":
-                return self.delete_one()
-            elif delete_pwd == "normal":
-                try:
-                    self.db.stored_passwords()
-                except PermissionError: 
-                    return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
-                id = str(input("Enter the ID of the password which you want delete: ")).strip()
-                return self.db.delete_normal(id)
-            elif delete_pwd == "master":
-                print('[red]NOTE: If you delete the master password you will lost all your sensitives data and will be logged out[/red]')
-                confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
-
-                if confirm == "y":
-                    self.db.delete_master()
-                    print("[green]Done. All passwods including the master password were successfully deleted.[/green]")
-                    print('[red]Now you will be logged out.[/red]')
-                    print('[cyan]Thanks for using.[/cyan]')
-                    exit(1)
-                
-                elif confirm != "n": 
-                    return
+            try:
+                self.db.stored_passwords()
+            except PermissionError: 
+                return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
+            id = str(input("Enter the ID of the password which you want delete: ")).strip()
+            return self.db.delete_one_password(id)
 
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
 
-    def delete_all(self) -> None: 
+    def delete_all_passwords(self) -> None: 
         """
         Delete all stored passwords
 
@@ -300,16 +283,39 @@ class Menu:
         try:
             self.db.stored_passwords()
         except PermissionError: 
-            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/red]")
+            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
 
         try:
-            confirm = str(input("\nAre you sure you want to delete all normal passwords? (Y/n) "))
+            confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) "))
             if confirm == "y".strip().lower():
-                self.db.delete_all()
-            elif confirm == "exit".strip().lower():
-                print("[cyan]Thanks for using.[/cyan]")
-                exit(1)
+                try:
+                    entered_master = getpass.getpass("Enter your master password to delete all stored passwords: ").strip()
+                    self.db.delete_all_passwords(entered_master)
+                    print(f"[green]{self.obj_.checkmark_} All normal passwords deleted successfully.[/green]")
+                except KeyboardInterrupt: 
+                    raise KeyboardInterrupt
+            elif confirm is ['exit' or 'n']:
+                self.obj_.exit
             elif confirm == "".strip().lower():
-                return self.delete_all()
+                return self.delete_all_passwords()
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
+
+    def delete_all_data(self):
+        """
+        Delete all data including master password
+        """
+        print('[red]If you delete the master password you will lost all data[/]')
+        confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
+
+        if confirm == "y":
+            self.db.delete_all_data()
+            print(f"[green]{self.obj_.checkmark_} All passwords deleted successfully.[/green]")
+            exit(0)
+        elif confirm.lower().strip() == 'n':
+            print("[red]Cancelling...[/]")
+            return self.begin_program()
+        elif confirm.lower().strip() == "exit":
+            self.obj_.exit_program()
+        elif confirm.strip() == "":
+            return self.delete_all_data()
