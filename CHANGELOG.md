@@ -57,3 +57,4 @@ This is the initial version.
 
 ### Removed
 - `vault.db` in `.gitignore`
+- Remove coding utf-8 (do not need)
