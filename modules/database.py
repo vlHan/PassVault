@@ -10,7 +10,7 @@ from Crypto.Util.Padding import pad, unpad
 
 class DataConnect:
     """
-    DataBase is the class which contains database SQlite
+    DataConnect is the class which contains database SQlite
     functions and encryption using AES and base 64.
     
     If has an error which should not exist, please report 
