@@ -11,11 +11,11 @@ Command-line password manager, for educational purposes, that stores localy, in 
 Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
 - Enter the folder: `cd PassVault/`
 - Install python3 
-  - Linux and macOS
+  - Linux
     - `python3 -m pip install -r requirements.txt`
     - Finished!
 
-  - Windows
+  - Windows and macOS
     - [Python 3, download and install](https://www.python.org/downloads/)
     - `python -m pip install -r requirements.txt`
     - Finished!
@@ -61,7 +61,6 @@ try: # try to connect with the database
 
 except sqlite3.Error: # if the connection does not work
     # rest of the program
-  
 ```
 
 ### AES Encryption
