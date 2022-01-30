@@ -19,9 +19,6 @@ class Menu:
         self.obj_ = obj
         self.db = DataConnect(master_pw, obj)
 
-    def colormk(self): 
-        ...
-    
     def httpverify(self, url):
         """
         Verify the URL by sending HTTP request
