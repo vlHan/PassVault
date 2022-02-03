@@ -1,7 +1,6 @@
 try:
     import Crypto
     import requests
-    import colorama
     import rich
     import backports.pbkdf2
 except ImportError:
