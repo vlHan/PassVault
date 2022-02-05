@@ -19,30 +19,6 @@ class Menu:
         self.obj_ = obj
         self.db = DataConnect(master_pw, obj)
 
-    def httpverify(self, url):
-        """
-        Verify the URL by sending HTTP request
-
-        Arguments
-            url [str] -- the URL of the platform
-
-        Returns 
-            If the URl is correct
-        """ 
-        if not url.startswith("http"):
-            print(f"[red]{self.obj_.xmark_} Invalid URL. The URL must contain http:// or https:// [/]")
-            sleep(1)
-
-            return self.inform_data()
-
-        elif url.startswith("http"):
-            try:
-                requests.get(url)
-            except requests.ConnectionError:
-                print(f"[red]{self.obj_.xmark_} Invalid URL.[/]")
-
-                return self.inform_data()
-
     def begin_program(self) -> str:
         """
         Beginning of the program
@@ -127,6 +103,30 @@ class Menu:
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
     
+    def httpverify(self, url):
+        """
+        Verify the URL by sending HTTP request
+
+        Arguments
+            url [str] -- the URL of the platform
+
+        Returns 
+            If the URl is correct
+        """ 
+        if not url.startswith("http"):
+            print(f"[red]{self.obj_.xmark_} Invalid URL. The URL must contain http:// or https:// [/]")
+            sleep(1)
+
+            return self.inform_data()
+
+        elif url.startswith("http"):
+            try:
+                requests.get(url)
+            except requests.ConnectionError:
+                print(f"[red]{self.obj_.xmark_} Invalid URL.[/]")
+
+                return self.inform_data()
+
     def inform_data(self) -> tuple:
         """Inform the user datas 
         
@@ -209,8 +209,8 @@ class Menu:
         if option not in ['platform', 'email', 'password', 'url']: 
             print(f'[red]{self.obj_.xmark_} Enter a valid answer.[/]\n')
             return self.edit_password()
-        new = str(input(f"Enter the new {option} which you want add: ")).strip()
 
+        new = str(input(f"Enter the new {option} which you want add: ")).strip()
         if option == "" or new == "": 
             print(f'[red]{self.obj_.xmark_} Inputs could not be empty.[/]\n')
             return self.edit_password()
@@ -288,7 +288,6 @@ class Menu:
                 try:
                     entered_master = getpass.getpass("Enter your master password to delete all stored passwords: ").strip()
                     self.db.delete_all_passwords(entered_master)
-                    print(f"[green]{self.obj_.checkmark_} All normal passwords deleted successfully.[/green]")
                 except KeyboardInterrupt: 
                     raise KeyboardInterrupt
             elif confirm is ['exit' or 'n']:
