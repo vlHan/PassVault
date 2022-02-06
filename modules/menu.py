@@ -94,8 +94,8 @@ class Menu:
         "\n[blue] 2) Update informations[/]"
         "\n[blue] 3) Look up passwords[/]"
         "\n[red] 4) Delete a password[/]"
-        "\n[red] 5) Delete all passwords[/]"
-        "\n[red] 6) Delete all normal data[/]"
+        "\n[red] 5) Delete all normal passwords[/]"
+        "\n[red] 6) Delete all data[/]"
         "\n[red] 7) Exit the program[/]")
 
         try:
@@ -286,8 +286,7 @@ class Menu:
             confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) "))
             if confirm == "y".strip().lower():
                 try:
-                    entered_master = getpass.getpass("Enter your master password to delete all stored passwords: ").strip()
-                    self.db.delete_all_passwords(entered_master)
+                    self.db.delete_all_passwords()
                 except KeyboardInterrupt: 
                     raise KeyboardInterrupt
             elif confirm is ['exit' or 'n']:

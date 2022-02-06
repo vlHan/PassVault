@@ -90,10 +90,6 @@ class DataConnect:
         """
         self.query_command(f"DROP TABLE {table}")
         self.obj_.conn.commit()
-    
-    def delete_all_data(self):
-        self.drop_table("passwords")
-        self.drop_table("masterpassword")
 
     def verify_id(self, id_opt: str):
         """
@@ -304,7 +300,7 @@ class DataConnect:
         self.delete_where(id_opt)
         print(f"[green]\n{self.obj_.checkmark_} The password was successfully deleted.\n[/green]")
 
-    def delete_all_passwords(self, entered_master: str) -> None:
+    def delete_all_passwords(self) -> None:
         """
         Delete all passwords stored in the database 
         (Normal passwords not the master)
@@ -319,9 +315,12 @@ class DataConnect:
             # verify if the database is empty - cannot opperate in a empty database
             print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
 
-        if self.master_pw != entered_master:
-            return print(f'[red]{self.obj_.xmark_} The master password is not correct.[/]')
-        
         self.drop_table('passwords')
         print(f"[green]{self.obj_.checkmark_} All normal passwords deleted successfully.[/green]")
-            
+
+    def delete_all_data(self):
+        """
+        Delete all data including the master password
+        """
+        self.drop_table("passwords")
+        self.drop_table("masterpassword")

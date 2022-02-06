@@ -39,7 +39,6 @@ class Manager:
         """
         try:
             self.cur.execute("SELECT * FROM masterpassword")
-            
             for row in self.cur.fetchall():
                 stored_master = row[0]
                 salt = row[1] 
