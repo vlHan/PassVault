@@ -197,7 +197,7 @@ class DataConnect:
         stored_infos = [platform, mail, password, url]
         for i in stored_infos:
             initial_value, contatenate = self.encryption(i, self.master_pw)
-            concatenate = initial_value + "|" + contatenate
+            concatenate = f'{initial_value}|{contatenate}'
             infos.append(concatenate)
         # Insert each value in the table passwords
         self.query_command(f"INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')")
@@ -218,10 +218,10 @@ class DataConnect:
             [str] The new password changed in the database
         """
         self.verify_id(id_opt)
-        
+
         initial_value, concatenate = self.encryption(new, self.master_pw)
-        ct_new_info = initial_value + "|" + concatenate
-        
+        ct_new_info = f'{initial_value}|{concatenate}'
+
         self.update_where(option, ct_new_info, id_opt)
         print(f"[green]{self.obj_.checkmark_} The {option} of the ID {id_opt} has successfully changed to {new}.[/green]")
 
@@ -238,11 +238,7 @@ class DataConnect:
         self.verify_id(id_opt)
         infos = []
         for row in self.query_command(f"SELECT * FROM passwords WHERE id = '{id_opt}';"):
-            infos.append(row[1])
-            infos.append(row[2])
-            infos.append(row[3])
-            infos.append(row[4])
-
+            infos.extend((row[1], row[2], row[3], row[4]))
             decrypted = [
                 self.decryption(
                     str(i).split("|")[0], 
@@ -251,7 +247,7 @@ class DataConnect:
                 )
                 for i in infos
             ]
-            
+
             infos.clear()
             return (
                 f"\n[yellow][ID: {row[0]}] {decrypted[0].decode()}[/yellow]\n"
@@ -260,7 +256,7 @@ class DataConnect:
                 f"URL: {decrypted[3].decode()}[/green]\n"
             )
 
-    def stored_passwords(self) -> None: 
+    def stored_passwords(self) -> None:
         """
         Stored passwords
 
@@ -270,13 +266,11 @@ class DataConnect:
         if self.query_command("SELECT COUNT(*) from passwords;").fetchall()[0][0] == 0:
             # verify if the database is empty - cannot opperate in a empty database
             raise PermissionError
-        
+
         print('[yellow]Current passwords stored:[/yellow]')
         infos = []
         for row in self.select_all('passwords'):
-            infos.append(row[1])
-            infos.append(row[2])
-
+            infos.extend((row[1], row[2]))
             decrypted = [
                 self.decryption(
                     str(i).split("|")[0], 
@@ -285,7 +279,7 @@ class DataConnect:
                 )
                 for i in infos
             ]
-            
+
             infos.clear()
             print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0].decode()}[/yellow]")
         
