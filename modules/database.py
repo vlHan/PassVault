@@ -313,7 +313,7 @@ class DataConnect:
         """
         if self.query_command("SELECT COUNT(*) from passwords;").fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database
-            print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
+            return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
 
         self.drop_table('passwords')
         print(f"[green]{self.obj_.checkmark_} All normal passwords deleted successfully.[/green]")
