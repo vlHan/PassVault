@@ -1,6 +1,6 @@
 # <a href="https://github.com/vlHan/PassVault"><img src="https://imgur.com/ZTbAS6w.png"></a>
 
-[![python](https://img.shields.io/badge/Python-3.5%20%7C%203.6%20%7C%203.7%20%7C%203.8-blue.svg)](https://www.python.org) [![repo size](https://img.shields.io/github/repo-size/vlHan/PassVault)](#) [![build](https://img.shields.io/badge/build-Passing-green)](#) [![license](https://img.shields.io/github/license/vlHan/PassVault.svg)](LICENSE)
+[![python](https://img.shields.io/badge/python->=3.7-blue.svg)](https://www.python.org) [![repo size](https://img.shields.io/github/repo-size/vlHan/PassVault)](#) [![build](https://img.shields.io/badge/build-Passing-green)](#) [![license](https://img.shields.io/github/license/vlHan/PassVault.svg)](LICENSE)
 
 [![asciicast](https://asciinema.org/a/tJaauMOKBy6tp47KSDEQxkm3H.svg)](https://asciinema.org/a/tJaauMOKBy6tp47KSDEQxkm3H)
 
@@ -10,7 +10,7 @@ Command-line password manager, for educational purposes, that stores localy, in 
 ## Installation
 Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a href="https://github.com/vlHan/PassVault/archive/refs/heads/main.zip">download zip</a>
 - Enter the folder: `cd PassVault/`
-- Install python3 
+- Install python3 and dependecies
   - Linux
     - `python3 -m pip install -r requirements.txt`
     - Finished!
