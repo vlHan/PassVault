@@ -79,6 +79,6 @@ See also the list of contributors who participated in this project.
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct.
 
 ## License 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/vlHan/PassVault/blob/master/LICENSE) file for details
+This project is licensed under the MIT License, see the [LICENSE](https://github.com/vlHan/PassVault/blob/master/LICENSE) file for details
 
 [⬆ Back to top](https://github.com/vlHan/PassVault#)<br>
