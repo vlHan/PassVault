@@ -1,7 +1,7 @@
 from rich import print
 
 __author__ = "vlHan"
-__version__ = "V1.2"
+__version__ = "V1.4"
 __license__ = "MIT"
 
 def banner() -> None:
