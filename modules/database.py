@@ -7,7 +7,7 @@ import string
 class DataConnect:
     """
     DataConnect is the class which contains database SQlite
-    functions and encryption using AES and base 64.
+    functions.
     
     If has an error which should not exist, please report 
     it at https://github.com/vlHan/PassVault/issues
