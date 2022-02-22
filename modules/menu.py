@@ -29,54 +29,39 @@ class Menu:
         Returns
             Informations to store in the database  
         """
-        choice = self.menu_interface()
+        try:
+            choice = self.menu_interface()
+        except KeyboardInterrupt as e: 
+            raise KeyboardInterrupt from e
         if choice in ["7", "exit"]:
             # Exit
             print("[cyan]Thanks for using.[/cyan]")
             exit(0)
-
+            
         elif choice == "1":
             # add password
-            try:
-                platform, mail, password, url = self.inform_data()
-                self.db.save_password(platform, mail, password, url)
-            except KeyboardInterrupt: 
-                raise KeyboardInterrupt
+            platform, mail, password, url = self.inform_data()
+            self.db.save_password(platform, mail, password, url)
 
         elif choice == "2":
             # edit informations
-            try:
-                self.edit_password()
-            except KeyboardInterrupt: 
-                raise KeyboardInterrupt
+            self.edit_password()
 
         elif choice == "3":
             # look up password
-            try:
-                self.look_up()
-            except KeyboardInterrupt: 
-                raise KeyboardInterrupt
+            self.look_up()
 
         elif choice == "4":
             # delete a password
-            try: 
-                self.delete_one_password()
-            except KeyboardInterrupt: 
-                raise KeyboardInterrupt
+            self.delete_one_password()
 
         elif choice == "5":
             # delete all normal passwords
-            try:
-                self.delete_all_passwords()
-            except KeyboardInterrupt: 
-                raise KeyboardInterrupt
+            self.delete_all_passwords()
         
         elif choice == "6": 
             # delete all passwords including master password
-            try:
-                self.delete_all_data()
-            except KeyboardInterrupt: 
-                raise KeyboardInterrupt
+            self.delete_all_data()
         
         else: 
             print(f'[red]{self.obj_.xmark_} Invalid option.[/]')
@@ -100,8 +85,8 @@ class Menu:
 
         try:
             return str(input("\n └──Enter a choice: ")).strip()
-        except KeyboardInterrupt: 
-            raise KeyboardInterrupt
+        except KeyboardInterrupt as e: 
+            raise KeyboardInterrupt from e
     
     def httpverify(self, url):
         """
@@ -159,8 +144,8 @@ class Menu:
             elif want_gen == "y":
                 try:
                     password = self.__return_generated()
-                except KeyboardInterrupt: 
-                    raise KeyboardInterrupt
+                except KeyboardInterrupt as e: 
+                    raise KeyboardInterrupt from e
 
             elif want_gen == "n":
                 password = getpass.getpass(prompt=f"Enter the password which you want to add for {platform} in the database: ").strip()
@@ -171,10 +156,10 @@ class Menu:
             
             return (platform, mail, password, url)
 
-        except KeyboardInterrupt:
-            raise KeyboardInterrupt
+        except KeyboardInterrupt as e:
+            raise KeyboardInterrupt from e
 
-    def __return_generated(self) -> str: 
+    def __return_generated(self) -> str:
         """Returns a generated password
         
         Returns:
@@ -240,8 +225,8 @@ class Menu:
 
             id_opt = str(input('\nEnter ID for the password you want to retrieve: ')).strip()
             print(self.db.look_up(id_opt))
-        except KeyboardInterrupt: 
-            raise KeyboardInterrupt
+        except KeyboardInterrupt as e: 
+            raise KeyboardInterrupt from e
 
     def delete_one_password(self) -> None:
         """
@@ -263,8 +248,8 @@ class Menu:
             id = str(input("Enter the ID of the password which you want delete: ")).strip()
             return self.db.delete_one_password(id)
 
-        except KeyboardInterrupt: 
-            raise KeyboardInterrupt
+        except KeyboardInterrupt as e: 
+            raise KeyboardInterrupt from e
 
     def delete_all_passwords(self) -> None: 
         """
@@ -285,16 +270,13 @@ class Menu:
         try:
             confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) "))
             if confirm == "y".strip().lower():
-                try:
-                    self.db.delete_all_passwords()
-                except KeyboardInterrupt: 
-                    raise KeyboardInterrupt
+                self.db.delete_all_passwords()
             elif confirm is ['exit' or 'n']:
                 self.obj_.exit
             elif confirm == "".strip().lower():
                 return self.delete_all_passwords()
-        except KeyboardInterrupt: 
-            raise KeyboardInterrupt
+        except KeyboardInterrupt as e: 
+            raise KeyboardInterrupt from e
 
     def delete_all_data(self):
         """
@@ -307,10 +289,10 @@ class Menu:
             self.db.delete_all_data()
             print(f"[green]{self.obj_.checkmark_} All passwords deleted successfully.[/green]")
             exit(0)
-        elif confirm.lower().strip() == 'n':
+        elif confirm == 'n':
             print("[red]Cancelling...[/]")
             return self.begin_program()
-        elif confirm.lower().strip() == "exit":
+        elif confirm == "exit":
             self.obj_.exit_program()
-        elif confirm.strip() == "":
+        elif confirm == "":
             return self.delete_all_data()

@@ -3,10 +3,6 @@ from modules import *
 import random
 import string
 
-from base64 import b64encode, b64decode
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
-
 
 class DataConnect:
     """
@@ -35,6 +31,7 @@ class DataConnect:
             );"""
         )
         self.specialchars = "_!@#$%&*()-"
+        self.encryption = Encryption()
     
     def query_command(self, sql: str, *args) -> None:
         """
@@ -64,10 +61,8 @@ class DataConnect:
             new [str] -- new data to be informed
             id_opt [str] -- the id to be selected
         """
-        cmd = self.query_command(f"UPDATE passwords SET {value} = '{new}' WHERE id = '{id_opt}'")
+        self.query_command(f"UPDATE passwords SET {value} = '{new}' WHERE id = '{id_opt}'")
         self.obj_.conn.commit()
-        
-        return cmd
         
     def delete_where(self, id_opt: str) -> None:
         """
@@ -76,10 +71,8 @@ class DataConnect:
         Arguments 
             id_opt [str] -- the id to be deleted
         """
-        cmd = self.query_command(f"DELETE FROM passwords WHERE id = '{id_opt}'")
+        self.query_command(f"DELETE FROM passwords WHERE id = '{id_opt}'")
         self.obj_.conn.commit()
-
-        return cmd
 
     def drop_table(self, table: str) -> None: 
         """
@@ -101,48 +94,6 @@ class DataConnect:
         id_list = [row[0] for row in self.select_all('passwords')]
         if id_opt not in str(id_list): 
             return print(f"[red]{self.obj_.xmark_} The ID is not correct[/]")
-
-    def encryption(self, pssw: str, key: str) -> tuple:
-        """
-        Encrypt and save the data to a file using master password as the key
-
-        Arguments
-            pssw [str] -- password to be encrypted 
-            key [str]  -- to encrypt and decrypt (masterpassword)
-
-        Return 
-            [str] initial value and the cyphertext in base64 (concatenate string)
-        """
-
-        pssw = pssw.encode('utf-8')
-        key = key.encode('utf-8')
-        cipher = AES.new(key, AES.MODE_CBC)
-        concatenate_bytes = cipher.encrypt(pad(pssw, AES.block_size))
-
-        # pass the initial_value to base64
-        iv = b64encode(cipher.iv).decode('utf-8')
-        concatenate = b64encode(concatenate_bytes).decode('utf-8')  # cyphertext to base64
-
-        return (iv, concatenate)
-
-    def decryption(self, initial_value: str, ciphertext: str, key: str) -> str:
-        """
-        Encrypt data using master password as the key
-
-        Arguments
-            initial_value [str] -- the value to pass to base64
-            ciphertext [str]  -- to encrypt and decrypt (masterpassword)
-            key [str] -- the key to encrypt/decrypt passwords
-
-        Returns 
-            [str] The cypher text decrypted      
-        """
-        initial_value = b64decode(initial_value)
-        concatenate = b64decode(ciphertext)
-        key = key.encode('utf-8')
-        cipher = AES.new(key, AES.MODE_CBC, initial_value)
-
-        return unpad(cipher.decrypt(concatenate), AES.block_size) # try decrypt the cypher text
     
     def generate_password(self) -> None:
         """Returns generated password
@@ -196,7 +147,7 @@ class DataConnect:
         infos = []
         stored_infos = [platform, mail, password, url]
         for i in stored_infos:
-            initial_value, contatenate = self.encryption(i, self.master_pw)
+            initial_value, contatenate = self.encryption.encrypt(i, self.master_pw)
             concatenate = f'{initial_value}|{contatenate}'
             infos.append(concatenate)
         # Insert each value in the table passwords
@@ -219,7 +170,7 @@ class DataConnect:
         """
         self.verify_id(id_opt)
 
-        initial_value, concatenate = self.encryption(new, self.master_pw)
+        initial_value, concatenate = self.encryption.encrypt(new, self.master_pw)
         ct_new_info = f'{initial_value}|{concatenate}'
 
         self.update_where(option, ct_new_info, id_opt)
@@ -240,7 +191,7 @@ class DataConnect:
         for row in self.query_command(f"SELECT * FROM passwords WHERE id = '{id_opt}';"):
             infos.extend((row[1], row[2], row[3], row[4]))
             decrypted = [
-                self.decryption(
+                self.encryption.decrypt(
                     str(i).split("|")[0], 
                     str(i).split("|")[1],
                     self.master_pw
@@ -272,7 +223,7 @@ class DataConnect:
         for row in self.select_all('passwords'):
             infos.extend((row[1], row[2]))
             decrypted = [
-                self.decryption(
+                self.encryption.decrypt(
                     str(i).split("|")[0], 
                     str(i).split("|")[1],
                     self.master_pw

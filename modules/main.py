@@ -16,10 +16,10 @@ import binascii
 class Manager:
     def __init__(self) -> None:
         self.master_pw  = None
-        self.xmark_ = '\u2717'
-        self.checkmark_ = '\u2713'
         self.conn = self.connect()
         self.cur = self.conn.cursor()
+        self.xmark_ = '\u2717'
+        self.checkmark_ = '\u2713'
     
     def connect(self):
         try:
@@ -38,9 +38,9 @@ class Manager:
         """
         try:
             self.cur.execute("SELECT * FROM masterpassword")
-            for row in self.cur.fetchall():
-                stored_master = row[0]
-                salt = row[1] 
+            for i in self.cur.fetchall():
+                stored_master = i[0]
+                salt = i[1] 
 
             print("[cyan][PassVault][/cyan] Enter the master password:", end=' ')
             self.master_pw = getpass.getpass("").strip()
@@ -54,7 +54,6 @@ class Manager:
                 while True:
                     # create instance of menu class
                     menu = Menu(self.master_pw, Manager())
-
                     try:
                         menu.begin_program()
                         sleep(1)
@@ -87,9 +86,12 @@ class Manager:
 
                 else:
                     self.cur.execute("CREATE TABLE IF NOT EXISTS masterpassword (password TEXT NOT NULL, salt TEXT NOT NULL);")
-                    salt = "".join(random.choice(string.ascii_uppercase + 
-                                                string.digits + 
-                                                string.ascii_lowercase) for _ in range(32))
+                    salt = "".join(random.choice(
+                            string.ascii_uppercase + 
+                            string.digits + 
+                            string.ascii_lowercase
+                        ) for _ in range(32)
+                    )
                     master = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
                     self.cur.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
                     self.conn.commit()
