@@ -4,9 +4,9 @@ import random
 import string
 
 
-class DataConnect:
+class Database:
     """
-    DataConnect is the class which contains database SQlite
+    Database is the class which contains database SQlite
     functions.
     
     If has an error which should not exist, please report 
@@ -14,7 +14,7 @@ class DataConnect:
 
     Arguments
         obj [Class] -- create instance of a class
-        master_pw [str] -- master password
+        master_pw {str} -- master password
     """
 
     def __init__(self, master_pssw: str, obj) -> None:
@@ -38,7 +38,7 @@ class DataConnect:
         Query commands 
 
         Arguments
-            sql [str] -- sqlite command
+            sql {str} -- sqlite command
         """
         return self.obj_.cur.execute(sql, *args)
     
@@ -47,8 +47,8 @@ class DataConnect:
         Select all 
 
         Arguments 
-            table [str] -- the table to be selected
-            star [str] -- what select from the table
+            table {str} -- the table to be selected
+            star {str} -- what select from the table
         """
         return self.query_command(f"SELECT * FROM {table}")
     
@@ -57,9 +57,9 @@ class DataConnect:
         Update somewhere
 
         Arguments 
-            value [str] -- the value to update
-            new [str] -- new data to be informed
-            id_opt [str] -- the id to be selected
+            value {str} -- the value to update
+            new {str} -- new data to be informed
+            id_opt {str} -- the id to be selected
         """
         self.query_command(f"UPDATE passwords SET {value} = '{new}' WHERE id = '{id_opt}'")
         self.obj_.conn.commit()
@@ -69,7 +69,7 @@ class DataConnect:
         Delete somewhere 
 
         Arguments 
-            id_opt [str] -- the id to be deleted
+            id_opt {str} -- the id to be deleted
         """
         self.query_command(f"DELETE FROM passwords WHERE id = '{id_opt}'")
         self.obj_.conn.commit()
@@ -79,7 +79,7 @@ class DataConnect:
         Drop tables
 
         Arguments 
-            table [str] -- table to be deleted
+            table {str} -- table to be deleted
         """
         self.query_command(f"DROP TABLE {table}")
         self.obj_.conn.commit()
@@ -89,7 +89,7 @@ class DataConnect:
         Verify if the ID is correct 
 
         Arguments
-            id_opt [str] -- the id informed
+            id_opt {str} -- the id informed
         """
         id_list = [row[0] for row in self.select_all('passwords')]
         if id_opt not in str(id_list): 
@@ -99,7 +99,7 @@ class DataConnect:
         """Returns generated password
         
         Returns
-            [str] -- A random password
+            {str} -- A random password
         """
         pw_len = int(input("What length would you like your password to be? (At least 8) "))
 
@@ -123,13 +123,13 @@ class DataConnect:
         Add values in the Database SQlite.
 
         Arguments 
-            platform [str] -- the platform of the password
-            mail [str] -- email of the account
-            password [str] -- password of the account to save in the database
-            url [str] -- URL of the platform
+            platform {str} -- the platform of the password
+            mail {str} -- email of the account
+            password {str} -- password of the account to save in the database
+            url {str} -- URL of the platform
         
         Returns 
-            [tuple] -- Sensitives datas saved in the SQLite.
+            {tuple} -- Sensitives datas saved in the SQLite.
         """
         # The ID must be the length of the datas stored in the database plus one
         # then the user can change/delete informations.
@@ -161,12 +161,12 @@ class DataConnect:
         Update values in the database SQlite.
 
         Arguments: 
-            option [str] -- what need to be changed
-            new [str] -- the new password
-            id [str] -- the id of the data
+            option {str} -- what need to be changed
+            new {str} -- the new password
+            id {str} -- the id of the data
 
         Returns
-            [str] The new password changed in the database
+            {str} The new password changed in the database
         """
         self.verify_id(id_opt)
 
@@ -181,10 +181,10 @@ class DataConnect:
         See all passwords stored in the database.
 
         Arguments 
-            id_opt [str] -- the ID chosed
+            id_opt {str} -- the ID chosed
 
         Returns
-            [tuple] The passwords stored
+            {tuple} The passwords stored
         """
         self.verify_id(id_opt)
         infos = []
@@ -212,7 +212,7 @@ class DataConnect:
         Stored passwords
 
         Returns 
-            [str] -- List of passwords
+            {str} -- List of passwords
         """
         if self.query_command("SELECT COUNT(*) from passwords;").fetchall()[0][0] == 0:
             # verify if the database is empty - cannot opperate in a empty database
@@ -235,10 +235,11 @@ class DataConnect:
             print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0].decode()}[/yellow]")
         
     def delete_one_password(self, id_opt: str) -> None:
-        """Delete one password
+        """
+        Delete one password
 
         Arguments 
-            id_opt [str] -- the ID chosed
+            id_opt {str} -- the ID chosed
         """
         self.verify_id(id_opt)
 
@@ -247,14 +248,10 @@ class DataConnect:
 
     def delete_all_passwords(self) -> None:
         """
-        Delete all passwords stored in the database 
-        (Normal passwords not the master)
+        Delete all passwords stored in the database
 
         Arguments
-            entered_master [str] -- master password to verify 
-
-        Returns
-            DataBase empty (SQlite)
+            entered_master {str} -- master password to verify 
         """
         if self.query_command("SELECT COUNT(*) from passwords;").fetchall()[0][0] == 0: 
             # verify if the database is empty - cannot opperate in a empty database

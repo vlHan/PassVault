@@ -17,11 +17,11 @@ class Encryption:
         Encrypt using master password as the key
 
         Arguments
-            pssw [str] -- password to be encrypted
-            key [str] -- a master password to encrypt and decrypt
+            pssw {str} -- password to be encrypted
+            key {str} -- a master password to encrypt and decrypt
 
         Return 
-            [str] initial value and the cyphertext in base64 (concatenate string)
+            {str} initial value and the cyphertext in base64 (concatenate string)
         """
 
         pssw = pssw.encode(self.encoding)
@@ -39,12 +39,12 @@ class Encryption:
         Decrypt data using master password as the key.
 
         Arguments
-            initial_value [str] -- the value to pass to base64
-            ciphertext [str] -- to encrypt and decrypt
-            key [str] -- a master password to encrypt and decrypt
+            initial_value {str} -- the value to pass to base64
+            ciphertext {str} -- to encrypt and decrypt
+            key {str} -- a master password to encrypt and decrypt
 
         Returns 
-            [str] The cypher text decrypted      
+            {str} The cypher text decrypted      
         """
         initial_value = b64decode(initial_value)
         concatenate = b64decode(ciphertext)

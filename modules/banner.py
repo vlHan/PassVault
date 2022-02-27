@@ -5,9 +5,6 @@ __version__ = "V1.4"
 __license__ = "MIT"
 
 def banner() -> None:
-    """
-    The banner for the system.
-    """
     print(f"""[cyan]
        ___             _   __          ____ 
       / _ \___ ____ __| | / /__ ___ __/ / /_

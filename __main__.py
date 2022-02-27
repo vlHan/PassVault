@@ -10,5 +10,4 @@ except ImportError:
 
 if __name__ == '__main__':
     from modules import *
-
     Manager().main()

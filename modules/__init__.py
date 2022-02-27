@@ -1,5 +1,5 @@
-from .encryption import Encryption
 from .banner import *
-from .database import DataConnect
+from .encryption import Encryption
+from .database import Database
 from .menu import Menu
 from .main import Manager

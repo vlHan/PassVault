@@ -12,12 +12,12 @@ class Menu:
     Menu class to grab informations from the user
 
     Arguments
-        master_pw [str] -- master password
+        master_pw {str} -- master password
         obj [Class] -- create instance of a class
     """
     def __init__(self, master_pw: str, obj) -> None:
         self.obj_ = obj
-        self.db = DataConnect(master_pw, obj)
+        self.db = Database(master_pw, obj)
 
     def begin_program(self) -> str:
         """
@@ -29,51 +29,6 @@ class Menu:
         Returns
             Informations to store in the database  
         """
-        try:
-            choice = self.menu_interface()
-        except KeyboardInterrupt as e: 
-            raise KeyboardInterrupt from e
-        if choice in ["7", "exit"]:
-            # Exit
-            print("[cyan]Thanks for using.[/cyan]")
-            exit(0)
-            
-        elif choice == "1":
-            # add password
-            platform, mail, password, url = self.inform_data()
-            self.db.save_password(platform, mail, password, url)
-
-        elif choice == "2":
-            # edit informations
-            self.edit_password()
-
-        elif choice == "3":
-            # look up password
-            self.look_up()
-
-        elif choice == "4":
-            # delete a password
-            self.delete_one_password()
-
-        elif choice == "5":
-            # delete all normal passwords
-            self.delete_all_passwords()
-        
-        elif choice == "6": 
-            # delete all passwords including master password
-            self.delete_all_data()
-        
-        else: 
-            print(f'[red]{self.obj_.xmark_} Invalid option.[/]')
-            return self.begin_program()
-
-    def menu_interface(self) -> None:
-        """
-        Menu interface
-
-        Raises: 
-            KeyboardInterrupt -- user interrupts
-        """
         banner()
         print("[blue] 1) Add a password[/]"
         "\n[blue] 2) Update informations[/]"
@@ -84,16 +39,99 @@ class Menu:
         "\n[red] 7) Exit the program[/]")
 
         try:
-            return str(input("\n └──Enter a choice: ")).strip()
-        except KeyboardInterrupt as e: 
-            raise KeyboardInterrupt from e
-    
+            choice = str(input("\n └──Enter a choice: ")).strip()
+
+            if choice in ["7", "exit"]:
+                # Exit
+                print("[cyan]Thanks for using.[/cyan]")
+                exit(0)
+                
+            elif choice == "1":
+                # add password
+                platform, mail, password, url = self.add_data()
+                self.db.save_password(platform, mail, password, url)
+
+            elif choice == "2":
+                # edit informations
+                self.edit_password()
+
+            elif choice == "3":
+                # look up password
+                self.look_up()
+
+            elif choice == "4":
+                # delete a password
+                self.delete_one_password()
+
+            elif choice == "5":
+                # delete all normal passwords
+                self.delete_all_passwords()
+            
+            elif choice == "6": 
+                # delete all passwords including master password
+                self.delete_all_data()
+            
+            else: 
+                print(f'[red]{self.obj_.xmark_} Invalid option.[/]')
+                return self.begin_program()
+        
+        except EOFError: 
+            raise KeyboardInterrupt
+
+    def add_data(self) -> tuple:
+        """
+        Inform the user datas 
+        
+        Raises: 
+            KeyboardInterrupt -- user interrupts
+
+        Returns
+            platform {str} -- user platform to stored
+            mail {str} -- email account
+            password {str} - account's password
+            url {str} - url of the platform
+        """
+        try: 
+            platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
+
+            if platform.isnumeric() or platform.isspace():
+                print(f"[red]{self.obj_.xmark_}Enter a valid answer[/]")
+                return self.add_data()
+
+            mail = str(input("Enter the email for this account: ")).lower().strip()
+            url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
+
+            self.httpverify(url)
+
+            want_gen = str(input(f"Do you want to generate a password for {platform}? (Y/n): ")).lower().strip()
+            # Generate a password for a platform.
+            if want_gen == "exit":
+                exit("[cyan]Thanks for using.[/cyan]")
+
+            elif want_gen == "y":
+                try:
+                    password = self.__return_generated()
+                except KeyboardInterrupt: 
+                    raise KeyboardInterrupt
+
+            elif want_gen == "n":
+                password = getpass.getpass(prompt=f"Enter the password which you want to add for {platform} in the database: ").strip()
+
+            else:
+                print("[red]Enter a valid answer.[/]")
+                return self.add_data()
+            
+            return (platform, mail, password, url)
+
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
+
     def httpverify(self, url):
         """
         Verify the URL by sending HTTP request
 
         Arguments
-            url [str] -- the URL of the platform
+            url {str} -- the URL of the platform
 
         Returns 
             If the URl is correct
@@ -111,53 +149,6 @@ class Menu:
                 print(f"[red]{self.obj_.xmark_} Invalid URL.[/]")
 
                 return self.inform_data()
-
-    def inform_data(self) -> tuple:
-        """Inform the user datas 
-        
-        Raises: 
-            KeyboardInterrupt -- user interrupts
-
-        Returns
-            platform [str] -- user platform to stored
-            mail [str] -- email account
-            password [str] - account's password
-            url [str] - url of the platform
-        """
-        try: 
-            platform = str(input("Enter the platform for which you want to store a password (ex. Google): ")).lower().strip().title()
-
-            if platform.isnumeric() or platform.isspace():
-                print(f"[red]{self.obj_.xmark_}Enter a valid answer[/]")
-                return self.inform_data()
-
-            mail = str(input("Enter the email for this account: ")).lower().strip()
-            url = str(input("Enter the URL of the website (ex. https://google.com): ")).lower().strip()
-
-            self.httpverify(url)
-
-            want_gen = str(input(f"Do you want to generate a password for {platform}? (Y/n): ")).lower().strip()
-            # Generate a password for a platform.
-            if want_gen == "exit":
-                exit("[cyan]Thanks for using.[/cyan]")
-
-            elif want_gen == "y":
-                try:
-                    password = self.__return_generated()
-                except KeyboardInterrupt as e: 
-                    raise KeyboardInterrupt from e
-
-            elif want_gen == "n":
-                password = getpass.getpass(prompt=f"Enter the password which you want to add for {platform} in the database: ").strip()
-
-            else:
-                print("[red]Enter a valid answer.[/]")
-                return self.inform_data()
-            
-            return (platform, mail, password, url)
-
-        except KeyboardInterrupt as e:
-            raise KeyboardInterrupt from e
 
     def __return_generated(self) -> str:
         """Returns a generated password
@@ -225,8 +216,8 @@ class Menu:
 
             id_opt = str(input('\nEnter ID for the password you want to retrieve: ')).strip()
             print(self.db.look_up(id_opt))
-        except KeyboardInterrupt as e: 
-            raise KeyboardInterrupt from e
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt
 
     def delete_one_password(self) -> None:
         """
@@ -248,8 +239,8 @@ class Menu:
             id = str(input("Enter the ID of the password which you want delete: ")).strip()
             return self.db.delete_one_password(id)
 
-        except KeyboardInterrupt as e: 
-            raise KeyboardInterrupt from e
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt
 
     def delete_all_passwords(self) -> None: 
         """
@@ -275,8 +266,8 @@ class Menu:
                 self.obj_.exit
             elif confirm == "".strip().lower():
                 return self.delete_all_passwords()
-        except KeyboardInterrupt as e: 
-            raise KeyboardInterrupt from e
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt
 
     def delete_all_data(self):
         """
@@ -294,5 +285,3 @@ class Menu:
             return self.begin_program()
         elif confirm == "exit":
             self.obj_.exit_program()
-        elif confirm == "":
-            return self.delete_all_data()

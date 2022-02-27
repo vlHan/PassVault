@@ -56,8 +56,7 @@ class Manager:
                     menu = Menu(self.master_pw, Manager())
                     try:
                         menu.begin_program()
-                        sleep(1)
-                    except KeyboardInterrupt: 
+                    except KeyboardInterrupt:
                         self.exit_program()
 
             else:
