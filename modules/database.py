@@ -150,7 +150,6 @@ class Database:
             tag, nonce, contatenate = self.encryption.encrypt(i, self.master_pw)
             concatenate = f'{tag}|{nonce}|{contatenate}'
             infos.append(concatenate)
-            print(infos)
         # Insert each value in the table passwords
         self.query_command(f"INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')")
         self.obj_.conn.commit()
