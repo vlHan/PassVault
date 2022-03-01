@@ -216,6 +216,7 @@ class Menu:
 
             id_opt = str(input('\nEnter ID for the password you want to retrieve: ')).strip()
             print(self.db.look_up(id_opt))
+            input("Press any key to continue...")
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
 
@@ -260,11 +261,11 @@ class Menu:
 
         try:
             confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) "))
-            if confirm == "y".strip().lower():
+            if confirm.strip().lower() == "y":
                 self.db.delete_all_passwords()
-            elif confirm is ['exit' or 'n']:
+            elif confirm.strip().lower() in ['exit', 'n']:
                 self.obj_.exit
-            elif confirm == "".strip().lower():
+            elif confirm.strip().lower() == "":
                 return self.delete_all_passwords()
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
