@@ -7,8 +7,7 @@ from sys import exit
 import getpass
 import sqlite3
 
-import hashlib 
-import hmac
+from base64 import b64encode, b64decode
 from backports.pbkdf2 import pbkdf2_hmac
 import binascii
 
@@ -45,7 +44,7 @@ class Manager:
             print("[cyan][PassVault][/cyan] Enter the master password:", end=' ')
             self.master_pw = getpass.getpass("").strip()
             
-            if hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() == stored_master:
+            if b64encode(pbkdf2_hmac("sha3-512", self.master_pw.encode("utf-8"), str(salt).encode(), 500000, 64)).decode("utf8") == stored_master:
                 print(f'[green]{self.checkmark_} Logged with success![/green]')
                 
                 key = pbkdf2_hmac("sha3-256", self.master_pw.encode("utf-8"), str(salt).encode(), 500000, 16)
@@ -91,7 +90,7 @@ class Manager:
                             string.ascii_lowercase
                         ) for _ in range(32)
                     )
-                    master = hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest()
+                    master = b64encode(pbkdf2_hmac("sha3-512", self.master_pw.encode("utf-8"), str(salt).encode(), 500000, 64)).decode("utf8")
                     self.cur.execute(f"INSERT INTO masterpassword VALUES('{master}', '{salt}')")
                     self.conn.commit()
                     
