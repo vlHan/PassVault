@@ -147,8 +147,8 @@ class Database:
         infos = []
         stored_infos = [platform, mail, password, url]
         for i in stored_infos:
-            initial_value, contatenate = self.encryption.encrypt(i, self.master_pw)
-            concatenate = f'{initial_value}|{contatenate}'
+            tag, nonce, contatenate = self.encryption.encrypt(i, self.master_pw)
+            concatenate = f'{tag}|{nonce}|{contatenate}'
             infos.append(concatenate)
         # Insert each value in the table passwords
         self.query_command(f"INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')")
@@ -170,8 +170,8 @@ class Database:
         """
         self.verify_id(id_opt)
 
-        initial_value, concatenate = self.encryption.encrypt(new, self.master_pw)
-        ct_new_info = f'{initial_value}|{concatenate}'
+        tag, nonce, concatenate = self.encryption.encrypt(new, self.master_pw)
+        ct_new_info = f'{tag}|{nonce}|{concatenate}'
 
         self.update_where(option, ct_new_info, id_opt)
         print(f"[green]{self.obj_.checkmark_} The {option} of the ID {id_opt} has successfully changed to {new}.[/green]")
@@ -194,6 +194,7 @@ class Database:
                 self.encryption.decrypt(
                     str(i).split("|")[0], 
                     str(i).split("|")[1],
+                    str(i).split("|")[2],
                     self.master_pw
                 )
                 for i in infos
@@ -201,10 +202,10 @@ class Database:
 
             infos.clear()
             return (
-                f"\n[yellow][ID: {row[0]}] {decrypted[0].decode()}[/yellow]\n"
-                f"[green]Email: {decrypted[1].decode()}\n"
-                f"Password: {decrypted[2].decode()}\n"
-                f"URL: {decrypted[3].decode()}[/green]\n"
+                f"\n[yellow][ID: {row[0]}] {decrypted[0]}[/yellow]\n"
+                f"[green]Email: {decrypted[1]}\n"
+                f"Password: {decrypted[2]}\n"
+                f"URL: {decrypted[3]}[/green]\n"
             )
 
     def stored_passwords(self) -> None:
@@ -221,18 +222,19 @@ class Database:
         print('[yellow]Current passwords stored:[/yellow]')
         infos = []
         for row in self.select_all('passwords'):
-            infos.extend((row[1], row[2]))
+            infos.extend((row[1], row[2], row[3]))
             decrypted = [
                 self.encryption.decrypt(
                     str(i).split("|")[0], 
                     str(i).split("|")[1],
+                    str(i).split("|")[2],
                     self.master_pw
                 )
                 for i in infos
             ]
 
             infos.clear()
-            print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0].decode()}[/yellow]")
+            print(f"[yellow][ID: {row[0]}] Platform: {decrypted[0]}[/yellow]")
         
     def delete_one_password(self, id_opt: str) -> None:
         """
