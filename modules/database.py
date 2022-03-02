@@ -33,7 +33,7 @@ class Database:
         self.specialchars = "_!@#$%&*()-"
         self.encryption = Encryption()
     
-    def query_command(self, sql: str, *args) -> None:
+    def query_command(self, sql: str, *args: object):
         """
         Query commands 
 
@@ -95,7 +95,7 @@ class Database:
         if id_opt not in str(id_list): 
             return print(f"[red]{self.obj_.xmark_} The ID is not correct[/]")
     
-    def generate_password(self) -> None:
+    def generate_password(self) -> str:
         """Returns generated password
         
         Returns
@@ -133,16 +133,16 @@ class Database:
         """
         # The ID must be the length of the datas stored in the database plus one
         # then the user can change/delete informations.
-        id = len(self.query_command("SELECT id FROM passwords;").fetchall())
+        id_db = len(self.query_command("SELECT id FROM passwords;").fetchall())
 
         while True:
-            if id in self.query_command("SELECT id FROM passwords;"):
+            if id_db in self.query_command("SELECT id FROM passwords;"):
                 # Verify if the ID exist in the database
                 # if exist the code will add one more
-                id += 1
+                id_db += 1
             else: 
-                id += 1
-                break 
+                id_db += 1
+                break
 
         infos = []
         stored_infos = [platform, mail, password, url]
@@ -151,7 +151,7 @@ class Database:
             concatenate = f'{tag}|{nonce}|{contatenate}'
             infos.append(concatenate)
         # Insert each value in the table passwords
-        self.query_command(f"INSERT INTO passwords VALUES('{id}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')")
+        self.query_command(f"INSERT INTO passwords VALUES('{id_db}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')")
         self.obj_.conn.commit()
 
         print(f"[green]\n{self.obj_.checkmark_} Thank you! Datas were successfully added.[/green]")
@@ -176,7 +176,7 @@ class Database:
         self.update_where(option, ct_new_info, id_opt)
         print(f"[green]{self.obj_.checkmark_} The {option} of the ID {id_opt} has successfully changed to {new}.[/green]")
 
-    def look_up(self, id_opt: str) -> None:
+    def look_up(self, id_opt: str) -> str:
         """
         See all passwords stored in the database.
 
@@ -184,7 +184,7 @@ class Database:
             id_opt {str} -- the ID chosed
 
         Returns
-            {tuple} The passwords stored
+            {str} The passwords stored
         """
         self.verify_id(id_opt)
         infos = []

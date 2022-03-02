@@ -13,7 +13,7 @@ class Menu:
 
     Arguments
         master_pw {str} -- master password
-        obj [Class] -- create instance of a class
+        obj {Class} -- create instance of a class
     """
     def __init__(self, master_pw: str, obj) -> None:
         self.obj_ = obj
@@ -23,7 +23,7 @@ class Menu:
         """
         Beginning of the program
 
-        Raises: 
+        Raises:
             KeyboardInterrupt -- user interrupts
 
         Returns
@@ -104,19 +104,11 @@ class Menu:
             self.httpverify(url)
 
             want_gen = str(input(f"Do you want to generate a password for {platform}? (Y/n): ")).lower().strip()
-            # Generate a password for a platform.
-            if want_gen == "exit":
-                exit("[cyan]Thanks for using.[/cyan]")
 
-            elif want_gen == "y":
-                try:
-                    password = self.__return_generated()
-                except KeyboardInterrupt: 
-                    raise KeyboardInterrupt
-
+            if want_gen == "y":
+                password = self.__return_generated()
             elif want_gen == "n":
                 password = getpass.getpass(prompt=f"Enter the password which you want to add for {platform} in the database: ").strip()
-
             else:
                 print("[red]Enter a valid answer.[/]")
                 return self.add_data()
@@ -156,15 +148,15 @@ class Menu:
         Returns:
             str -- A randomly generated password
         """
-
-        generated_pass = self.db.generate_password()
-        loop = str(input("Generate a new password? (Y/n): ")).lower().strip()
-        if loop == "exit":
-            exit('Thanks for using.')
-        elif (loop == 'y') or (loop.strip() == ""):
-            return self.__return_generated() # recursive call
-        elif loop == 'n':
-            return generated_pass
+        try:
+            generated_pass = self.db.generate_password()
+            loop = str(input("Generate a new password? (Y/n): ")).lower().strip()
+            if (loop == 'y') or (loop.strip() == ""):
+                return self.__return_generated() # recursive call
+            elif loop == 'n':
+                return generated_pass
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt
     
     def edit_password(self) -> None:
         """
@@ -180,22 +172,23 @@ class Menu:
             self.db.stored_passwords()
         except PermissionError: 
             return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
-        
-        option = str(input("\nWhat do you want to change? (platform/email/password/url) ")).lower().strip()
-        if option not in ['platform', 'email', 'password', 'url']: 
-            print(f'[red]{self.obj_.xmark_} Enter a valid answer.[/]\n')
-            return self.edit_password()
+        try: 
+            option = str(input("\nWhat do you want to change? (platform/email/password/url) ")).lower().strip()
+            if option not in ['platform', 'email', 'password', 'url']: 
+                print(f'[red]{self.obj_.xmark_} Enter a valid answer.[/]\n')
+                return self.edit_password()
 
-        new = str(input(f"Enter the new {option} which you want add: ")).strip()
-        if option == "" or new == "": 
-            print(f'[red]{self.obj_.xmark_} Inputs could not be empty.[/]\n')
-            return self.edit_password()
+            new = str(input(f"Enter the new {option} which you want add: ")).strip()
+            if option == "" or new == "": 
+                print(f'[red]{self.obj_.xmark_} Inputs could not be empty.[/]\n')
+                return self.edit_password()
+            elif option == "url":
+                self.httpverify(new)
 
-        if option == "url":
-            self.httpverify(new)
-
-        id_opt = str(input(f"\nEnter the ID from the {option}: "))
-        self.db.edit_password(new, option, id_opt)
+            id_opt = str(input(f"\nEnter the ID from the {option}: "))
+            self.db.edit_password(new, option, id_opt)
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt
 
     def look_up(self) -> None:
         """
@@ -236,8 +229,8 @@ class Menu:
                 self.db.stored_passwords()
             except PermissionError: 
                 return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
-            id = str(input("Enter the ID of the password which you want delete: ")).strip()
-            return self.db.delete_one_password(id)
+            id_opt = str(input("Enter the ID of the password which you want delete: ")).strip()
+            return self.db.delete_one_password(id_opt)
 
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
@@ -262,7 +255,7 @@ class Menu:
             confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) "))
             if confirm == "y".strip().lower():
                 self.db.delete_all_passwords()
-            elif confirm is ['exit' or 'n']:
+            elif confirm == 'n':
                 self.obj_.exit
             elif confirm == "".strip().lower():
                 return self.delete_all_passwords()
@@ -274,14 +267,18 @@ class Menu:
         Delete all data including master password
         """
         print('[red]If you delete the master password you will lost all data[/]')
-        confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
+        try:
+            confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
 
-        if confirm == "y":
-            self.db.delete_all_data()
-            print(f"[green]{self.obj_.checkmark_} All passwords deleted successfully.[/green]")
-            exit(0)
-        elif confirm == 'n':
-            print("[red]Cancelling...[/]")
-            return self.begin_program()
-        elif confirm == "exit":
-            self.obj_.exit_program()
+            if confirm == "y":
+                self.db.delete_all_data()
+                print(f"[green]{self.obj_.checkmark_} All passwords deleted successfully.[/green]")
+                exit(0)
+            elif confirm == 'n':
+                print("[red]Cancelling...[/]")
+                return self.begin_program()
+            elif confirm == "exit":
+                self.obj_.exit_program()
+            
+        except KeyboardInterrupt: 
+            raise KeyboardInterrupt

@@ -15,4 +15,4 @@ def banner() -> None:
     version: {__version__}
     GitHub: https://github.com/vlHan/PassVault
     
-    [/cyan][magenta]*Enter 'exit' or 'Ctrl + C' at any point to exit.*[/magenta]\n""")
+    [/cyan][magenta]*Enter 'Ctrl + C' at any point to exit.*[/magenta]\n""")

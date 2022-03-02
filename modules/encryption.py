@@ -1,5 +1,3 @@
-from modules import *
-
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 
@@ -48,4 +46,5 @@ class Encryption:
         key = key.encode(self.encoding)
         cipher = AES.new(key, AES.MODE_GCM, nonce=b64decode(nonce))
         decoded = cipher.decrypt_and_verify(ciphertext, tag)
+        
         return decoded.decode()

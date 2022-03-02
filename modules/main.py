@@ -1,13 +1,14 @@
 from modules import *
 
-from time import sleep
-import random, string
+import random
+import string
 from sys import exit
 
+import os
 import getpass
 import sqlite3
 
-from base64 import b64encode, b64decode
+from base64 import b64encode
 from backports.pbkdf2 import pbkdf2_hmac
 import binascii
 
@@ -24,7 +25,7 @@ class Manager:
         try:
             self.conn = sqlite3.connect(f'./PassVault/{getpass.getuser()}.db')
             return self.conn
-        except sqlite3.OperationalError: 
+        except sqlite3.OperationalError:
             self.conn = sqlite3.connect(f'./{getpass.getuser()}.db')
             return self.conn
 
@@ -39,7 +40,7 @@ class Manager:
             self.cur.execute("SELECT * FROM masterpassword")
             for i in self.cur.fetchall():
                 stored_master = i[0]
-                salt = i[1] 
+                salt = i[1]
 
             print("[cyan][PassVault][/cyan] Enter the master password:", end=' ')
             self.master_pw = getpass.getpass("").strip()
@@ -54,8 +55,9 @@ class Manager:
                     # create instance of menu class
                     menu = Menu(self.master_pw, Manager())
                     try:
-                        sleep(1)
                         menu.begin_program()
+                        input("Press any key to return... ")
+                        os.system("cls" if os.name == "nt" else "clear")
                     except KeyboardInterrupt:
                         self.exit_program()
 
