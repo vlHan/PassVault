@@ -56,7 +56,7 @@ try: # try to connect with the database
     self.master_pw = getpass.getpass("").strip()
      
     # compare the two hashes
-    if b64encode(pbkdf2_hmac("sha3-512", self.master_pw.encode("utf-8"), str(salt).encode(), 500000, 64)).decode("utf8") == stored_master:
+    if b64encode(pbkdf2_hmac("sha3-512", self.master_pw.encode("utf-8"), str(salt).encode(), 500000)).decode("utf8") == stored_master:
         # master password is correct
 
 except sqlite3.Error: # if the connection does not work
