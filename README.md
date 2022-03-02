@@ -47,16 +47,16 @@ To authenticate the user, they are prompted to create a master password (that is
 
 ```py
 try: # try to connect with the database
-    self.cursor.execute("SELECT * FROM masterpassword")
-    for row in self.cursor.fetchall():
-        stored_master = row[0]
-        salt = row[1] 
+    self.cur.execute("SELECT * FROM masterpassword")
+    for i in self.cur.fetchall():
+        stored_master = i[0]
+        salt = i[1] 
 
     print("[cyan][PassVault][/cyan] Enter the master password:", end=' ')
-    self.master_pw = getpass.getpass("").strip() # ask the master password
-    
+    self.master_pw = getpass.getpass("").strip()
+     
     # compare the two hashes
-    if hmac.new(self.master_pw.encode(), msg=str(salt).encode(), digestmod=hashlib.sha3_512).hexdigest() == stored_master: 
+    if b64encode(pbkdf2_hmac("sha3-512", self.master_pw.encode("utf-8"), str(salt).encode(), 500000, 64)).decode("utf8") == stored_master:
         # master password is correct
 
 except sqlite3.Error: # if the connection does not work
