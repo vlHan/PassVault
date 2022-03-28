@@ -252,12 +252,12 @@ class Menu:
             return print(f"[red]{self.obj_.xmark_} The database is empty. Try adding a password.[/]")
 
         try:
-            confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) "))
-            if confirm == "y".strip().lower():
+            confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) ")).strip().lower()
+            if confirm == "y":
                 self.db.delete_all_passwords()
             elif confirm == 'n':
                 self.obj_.exit
-            elif confirm == "".strip().lower():
+            elif confirm == "":
                 return self.delete_all_passwords()
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
