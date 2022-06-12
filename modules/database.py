@@ -130,9 +130,10 @@ class Database:
         
         Returns 
             {tuple} -- Sensitives datas saved in the SQLite.
+        
+        The ID must be the length of the datas stored in the database plus one
+        Then the user can change/delete informations.
         """
-        # The ID must be the length of the datas stored in the database plus one
-        # then the user can change/delete informations.
         id_db = len(self.query_command("SELECT id FROM passwords;").fetchall())
 
         while True:
@@ -144,14 +145,15 @@ class Database:
                 id_db += 1
                 break
 
-        infos = []
+        datas = []
         stored_infos = [platform, mail, password, url]
         for i in stored_infos:
             tag, nonce, contatenate = self.encryption.encrypt(i, self.master_pw)
             concatenate = f'{tag}|{nonce}|{contatenate}'
-            infos.append(concatenate)
+            datas.append(concatenate)
+
         # Insert each value in the table passwords
-        self.query_command(f"INSERT INTO passwords VALUES('{id_db}', '{infos[0]}', '{infos[1]}', '{infos[2]}', '{infos[3]}')")
+        self.query_command(f"INSERT INTO passwords VALUES('{id_db}', '{datas[0]}', '{datas[1]}', '{datas[2]}', '{datas[3]}')")
         self.obj_.conn.commit()
 
         print(f"[green]\n{self.obj_.checkmark_} Thank you! Datas were successfully added.[/green]")
@@ -171,9 +173,9 @@ class Database:
         self.verify_id(id_opt)
 
         tag, nonce, concatenate = self.encryption.encrypt(new, self.master_pw)
-        ct_new_info = f'{tag}|{nonce}|{concatenate}'
+        concatenate_new_info = f'{tag}|{nonce}|{concatenate}'
 
-        self.update_where(option, ct_new_info, id_opt)
+        self.update_where(option, concatenate_new_info, id_opt)
         print(f"[green]{self.obj_.checkmark_} The {option} of the ID {id_opt} has successfully changed to {new}.[/green]")
 
     def look_up(self, id_opt: str) -> str:

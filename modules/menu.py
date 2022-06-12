@@ -41,7 +41,7 @@ class Menu:
         try:
             choice = str(input("\n └──Enter a choice: ")).strip()
 
-            if choice in ["7", "exit"]:
+            if choice in {"7", "exit"}:
                 # Exit
                 print("[cyan]Thanks for using.[/cyan]")
                 exit(0)
@@ -151,7 +151,7 @@ class Menu:
         try:
             generated_pass = self.db.generate_password()
             loop = str(input("Generate a new password? (Y/n): ")).lower().strip()
-            if (loop == 'y') or (loop.strip() == ""):
+            if loop == 'y' or not loop.strip():
                 return self.__return_generated() # recursive call
             elif loop == 'n':
                 return generated_pass
@@ -179,7 +179,7 @@ class Menu:
                 return self.edit_password()
 
             new = str(input(f"Enter the new {option} which you want add: ")).strip()
-            if option == "" or new == "": 
+            if not option or not new: 
                 print(f'[red]{self.obj_.xmark_} Inputs could not be empty.[/]\n')
                 return self.edit_password()
             elif option == "url":
@@ -235,7 +235,7 @@ class Menu:
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
 
-    def delete_all_passwords(self) -> None: 
+    def delete_all_passwords(self) -> None:
         """
         Delete all stored passwords
 
@@ -253,12 +253,12 @@ class Menu:
 
         try:
             confirm = str(input("\nAre you sure you want to delete all passwords? (Y/n) ")).strip().lower()
-            if confirm == "y":
-                self.db.delete_all_passwords()
-            elif confirm == 'n':
+            if confirm == 'n':
                 self.obj_.exit
-            elif confirm == "":
+            elif not confirm:
                 return self.delete_all_passwords()
+            elif confirm == "y":
+                self.db.delete_all_passwords()
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
 
@@ -270,15 +270,15 @@ class Menu:
         try:
             confirm = str(input("Are you sure you want to delete the master password? (Y/n) ")).strip().lower()
 
-            if confirm == "y":
-                self.db.delete_all_data()
-                print(f"[green]{self.obj_.checkmark_} All passwords deleted successfully.[/green]")
-                exit(0)
-            elif confirm == 'n':
+            if confirm == 'n':
                 print("[red]Cancelling...[/]")
                 return self.begin_program()
             elif confirm == "exit":
                 self.obj_.exit_program()
-            
+
+            elif confirm == "y":
+                self.db.delete_all_data()
+                print(f"[green]{self.obj_.checkmark_} All passwords deleted successfully.[/green]")
+                exit(0)
         except KeyboardInterrupt: 
             raise KeyboardInterrupt
