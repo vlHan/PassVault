@@ -23,19 +23,19 @@ Clone this repository: `git clone https://github.com/vlHan/PassVault.git` or <a 
 ## Usage
 Use the following commands to run the program
 ```bash
-Linux and macOS
+Linux
   # in the diretory
   $ python3 .
     
   # out of the diretory
   $ python3 PassVault
     
-Windows
+Windows and macOS
   # in the diretory
-  $ python .
+  python .
     
   # out of the diretory
-  $ python PassVault
+  python PassVault
 ```
 **⚠️** The program needs all the files, be sure to have all the dependecies and files <a href="https://github.com/vlHan/PassVault#installation">installed</a>.
 
@@ -67,7 +67,7 @@ except sqlite3.Error: # if the connection does not work
 The encryption method used in this program comes from the python library [PyCryptoDome](https://pypi.org/project/pycryptodome/). This program uses AES encryption methods to store sensitive data (in this case passwords) into a SQLite database.
 
 ### SQLite Functions
-The SQLite database is used to store sensitive data, as mentioned above. This type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is localy lost, you only need the password manager to be able to decrypt the passwords stored in your backup database.
+The SQLite database is used to store sensitive data, as mentioned above. This type of database was used instead of MySQL, as it is easily transported and lightweight. Despite being less secure, it can be easily used and manipulated, so it is possible to keep it in a backup, in case the database is localy lost, you only need the PassVault to be able to decrypt the passwords stored in your backup database.
 
 ## Contributors
 See also the list of contributors who participated in this project.
